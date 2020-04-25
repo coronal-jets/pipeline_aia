@@ -19,6 +19,6 @@ pro download_aia_full
     foo = vso_get(search_results,/rice)
     cd,'..'
   endfor
-
+  cd,'..'
 end
 
