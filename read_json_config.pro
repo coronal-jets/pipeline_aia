@@ -1,5 +1,5 @@
 function read_json_config, config_file
-
+compile_opt idl2
   ;check the presence of the configuration file
   config_found = file_test(config_file)
   if not config_found then message, "Configuration file '" + config_file + "' not found"

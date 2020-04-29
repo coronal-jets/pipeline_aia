@@ -1,4 +1,5 @@
 function xy2carrington, x_arcsec, y_arcsec, time_ref
+compile_opt idl2
   wcs_ref = wcs_2d_simulate(4096, 4096, date_obs = time_ref)
   n = n_elements(x_arcsec)
   crd = dblarr(2,n)
@@ -10,6 +11,7 @@ function xy2carrington, x_arcsec, y_arcsec, time_ref
 end
 
 pro pipeline_aia_fits_cutout, fits_in, fits_out, center, size_px
+compile_opt idl2
   cdelt = [0.6d, 0.6d]
   read_sdo, fits_in, index_in, data_in, /use_shared, /uncomp_delete
   data_in = float(data_in)

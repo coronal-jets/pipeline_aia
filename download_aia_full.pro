@@ -1,5 +1,5 @@
-
 pro download_aia_full
+compile_opt idl2
   config_file = "config.json"
   ;read config
   config = read_json_config(config_file)
