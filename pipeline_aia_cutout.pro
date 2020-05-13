@@ -34,7 +34,7 @@ compile_opt idl2
   data_out /= index_in.exptime
   index_out.exptime =1.0
   
-  writefits, fits_out, float(data_out), index_out
+  writefits, fits_out, float(data_out), struct2fitshead(index_out)
 end
 
 pro pipeline_aia_dir_cutout, dir_in, dir_out, center, size_px
