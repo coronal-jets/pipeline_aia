@@ -36,7 +36,17 @@ l_pipeline_aia_movie_get_scale, 0, 0, ind_seq[0], xstep, xshift, ystep, yshift
 pipeline_aia_get_colormaps, wave, aia_lim, cm_aia, rdf_lim, cm_run_diff
  
 data_prev = !NULL
-win = window(dimensions = [1000, 500])
+;win = window(dimensions = [1000, 500])
+
+;Use Z-buffer for generating plots
+set_plot,'Z'
+device,set_resolution = [1000,500], set_pixel_depth = 24, decomposed =0
+!p.color = 0
+!p.background = 255
+!p.charsize=1.5
+
+ctrl =0.
+n_files = n_elements(files_in)
 foreach file_in, files_in, i do begin
     read_sdo_silent, file_in, index, data, /use_shared, /uncomp_delete, /hide, /silent 
     rtitle = ''
@@ -61,15 +71,22 @@ foreach file_in, files_in, i do begin
         endfor
         
         jtitle = str_replace(str_replace(index.t_obs, 'T', ' '), 'Z', '')
-        win.Erase
-        pipeline_aia_movie_draw, data, rd, jet, win, jtitle, rtitle, xstep, xshift, ystep, yshift, aia_lim, cm_aia, rdf_lim, cm_run_diff
-        pngfile =  work_dir + path_sep() + vis_data_dir_wave + path_sep() + prefix + "_aia" + string(i, FORMAT = '(I05)') + ".png"
+        ;win.Erase
+        erase
+        if double(i)/n_files*100d gt ctrl then begin
+            message, 'Preparing movie , ' + strcompress(ctrl,/remove_all) + '%',/info
+            ctrl += 5 
+        endif
+        pipeline_aia_movie_draw, data, rd, jet, win, jtitle, rtitle, xstep, xshift,$
+           ystep, yshift, aia_lim, cm_aia, rdf_lim, cm_run_diff, wave = wave
+        pngfile =  work_dir + path_sep() + vis_data_dir_wave + path_sep() + prefix + "_aia" + string(i, FORMAT = '(I05)') + ".jpg"
         ;write_png, pngfile, TVRD(/TRUE)
-        if ~keyword_set(nosave) then win.Save, pngfile, width = 1000, height = 500, bit_depth = 2 
+        if ~keyword_set(nosave) then write_jpeg, pngfile, tvrd(true=1), true =1, quality =100 
     endif
     data_prev = data
 endforeach
-win.Close
+;win.Close
+
 
 frames_prev = 6
 frames_post = 3
@@ -110,14 +127,16 @@ for k = 0, n_elements(found_candidates)-1 do begin
     from = max([1, cand[0].pos-frames_prev])
     to = min([cand[nc-1].pos+frames_post, n_elements(files_in)-1])
     data_prev = !NULL
-    win = window(dimensions = [1000, 500])
+
     detname = "detail" + string(k+1, FORMAT = '(I02)')
     details.Add, detname 
     vis_data_wave_add = work_dir + path_sep() + vis_data_dir_wave + path_sep() + detname
     file_mkdir, vis_data_wave_add
+    ctrl =0.
+    n_files = n_elements(to - from+1)
     for i = from, to do begin
         file_in = files_in[i]
-        read_sdo, file_in, index, data0, /use_shared, /uncomp_delete
+        read_sdo_silent, file_in, index, data0, /use_shared, /uncomp_delete
         if data_prev ne !NULL then begin
             pos = i-1 ; position in run_diff
             pipeline_aia_irc_run_diff, data0, data_prev, rd
@@ -142,15 +161,19 @@ for k = 0, n_elements(found_candidates)-1 do begin
             endif
             
             jtitle = str_replace(str_replace(index.t_obs, 'T', ' '), 'Z', '')
-            win.Erase
-            pipeline_aia_movie_draw, data, rd, jet, win, jtitle, rtitle, xstep, xshift, ystep, yshift, aia_lim, cm_aia, rdf_lim, cm_run_diff
-            pngfile = vis_data_wave_add + path_sep() + prefix + "_aia" + string(i-from, FORMAT = '(I05)') + ".png"
+            erase
+            if double(i - from)/n_files*100d gt ctrl then begin
+              message, 'Preparing movie , ' + strcompress(ctrl,/remove_all) + '%',/info
+              ctrl += 5
+            endif
+            pipeline_aia_movie_draw, data, rd, jet, win, jtitle, rtitle, xstep, xshift, ystep, yshift, aia_lim, cm_aia, rdf_lim, cm_run_diff, wave = wave
+            pngfile = vis_data_wave_add + path_sep() + prefix + "_aia" + string(i-from, FORMAT = '(I05)') + ".jpg"
             ;write_png, pngfile, TVRD(/TRUE)
-            if ~keyword_set(nosave) then win.Save, pngfile, width = 1000, height = 500, bit_depth = 2 
+            if ~keyword_set(nosave) then write_jpeg, pngfile, tvrd(true=1), true =1, quality =100
         endif
         data_prev = data0
     endfor
-    win.Close
+    
 endfor
-
+set_plot,'X'
 end
