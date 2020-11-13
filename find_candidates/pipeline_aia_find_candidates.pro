@@ -32,6 +32,7 @@ foreach file_in, files_in, i do begin
         szd = size(data)
         seq = dblarr(szd[1], szd[2], n_files)
         ind_seq = replicate(index, n_files)
+        temp_index = index
         run_diff = dblarr(szd[1], szd[2], n_files-1)
     endif
     seq[*, *, i] = data - mean(data)
@@ -43,8 +44,8 @@ foreach file_in, files_in, i do begin
         aia_lim[0] = min([aia_lim[0], min(data)])
         aia_lim[1] = max([aia_lim[1], max(data)])
     endelse
-         
-    ind_seq[i] = index 
+    STRUCT_ASSIGN, index, temp_index     
+    ind_seq[i] = temp_index 
     if i gt 0 then begin
         pipeline_aia_irc_run_diff, seq[*, *, i], seq[*, *, i-1], rd
         run_diff[*, *, i-1] = rd
