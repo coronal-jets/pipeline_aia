@@ -133,7 +133,7 @@ for k = 0, n_elements(found_candidates)-1 do begin
     vis_data_wave_add = work_dir + path_sep() + vis_data_dir_wave + path_sep() + detname
     file_mkdir, vis_data_wave_add
     ctrl =0.
-    n_files = n_elements(to - from+1)
+    n_files = to - from+1
     for i = from, to do begin
         file_in = files_in[i]
         read_sdo_silent, file_in, index, data0, /use_shared, /uncomp_delete
@@ -162,7 +162,7 @@ for k = 0, n_elements(found_candidates)-1 do begin
             
             jtitle = str_replace(str_replace(index.t_obs, 'T', ' '), 'Z', '')
             erase
-            if double(i - from)/n_files*100d gt ctrl then begin
+            if double(i - from+1)/n_files*100d gt ctrl then begin
               message, 'Preparing movie , ' + strcompress(ctrl,/remove_all) + '%',/info
               ctrl += 5
             endif
