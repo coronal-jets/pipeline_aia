@@ -22,47 +22,20 @@ if n_files lt 2 then begin
     message, "No AIA-fits to find jets, check config and input keys."
 endif
 
-ctrl = 5
-foreach file_in, files_in, i do begin
-    compile_opt idl2
-    
-;    read_sdo, file_in, index, data, /use_shared, /uncomp_delete
-    read_sdo_silent, file_in, index, data, /use_shared, /uncomp_delete, /hide, /silent 
-    if isa(seq, /NULL) then begin
-        szd = size(data)
-        seq = dblarr(szd[1], szd[2], n_files)
-        ind_seq = replicate(index, n_files)
-        temp_index = index
-        run_diff = dblarr(szd[1], szd[2], n_files-1)
-    endif
-    seq[*, *, i] = data - mean(data)
-    if aia_lim eq !NULL then begin
-        aia_lim = dblarr(2)
-        aia_lim[0] = min(data)
-        aia_lim[1] = max(data)
-    endif else begin
-        aia_lim[0] = min([aia_lim[0], min(data)])
-        aia_lim[1] = max([aia_lim[1], max(data)])
-    endelse
-    STRUCT_ASSIGN, index, temp_index     
-    ind_seq[i] = temp_index 
-    if i gt 0 then begin
-        pipeline_aia_irc_run_diff, seq[*, *, i], seq[*, *, i-1], rd
-        run_diff[*, *, i-1] = rd
-        if rdf_lim eq !NULL then begin
-            rdf_lim = dblarr(2)
-            rdf_lim[0] = min(rd)
-            rdf_lim[1] = max(rd)
-        endif else begin
-            rdf_lim[0] = min([rdf_lim[0], min(rd)])
-            rdf_lim[1] = max([rdf_lim[1], max(rd)])
-        endelse 
-    endif 
-    if double(i)/n_files*100d gt ctrl then begin
-        print, 'running difference, ' + strcompress(ctrl,/remove_all) + '%'
-        ctrl += 5 
-    endif
-endforeach
+;reading AIA files
+read_sdo,files_in.ToArray(),ind_seq, data,/silent
+
+;normalizing exposure
+data = float(data); change to double if necessary
+for i=0,n_files-1 do begin
+    exptime = ind_seq[i].exptime
+    data[*,*,i] = data[*,*,i]/exptime
+endfor
+;running difference
+run_diff = data[*,*,1:*] - data[*,*,0:-2]
+;Free memory used for the original AIA data
+data =0.
+
 
 par1 = presets.par1
 par2 = presets.par2
