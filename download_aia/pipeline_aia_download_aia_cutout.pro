@@ -36,7 +36,7 @@ message,msg,/info
 
 
 
-message,'downloding withy aria2...',/info
+message,'downloding with aria2...',/info
 aria2_urls, urls, save_dir
 message,'downlod complete',/info
 
