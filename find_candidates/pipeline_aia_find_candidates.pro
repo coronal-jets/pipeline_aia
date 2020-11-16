@@ -74,7 +74,7 @@ pipeline_aia_irc_renumber_clusters, clust3d
 n_candidates = max(clust3d)
 message,strcompress(n_candidates)+" candidates after removing short events ",/info
 
-pipeline_aia_irc_aspect_filter_clusters, clust3d, presets.ellipse
+pipeline_aia_irc_aspect_filter_clusters, clust3d, presets.min_aspect
 pipeline_aia_irc_renumber_clusters, clust3d
 n_candidates = max(clust3d)
 message,strcompress(n_candidates)+" candidates after removing events with low aspect ",/info
