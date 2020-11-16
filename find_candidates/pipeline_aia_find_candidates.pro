@@ -7,7 +7,7 @@ ts = anytim(config.tstart)
 te = anytim(config.tstop)
 
 files_in_all = file_search(filepath('*.fits', root_dir = work_dir + path_sep() + aia_dir_wave_sel))
-n_files = n_elements(files_in)
+n_files = n_elements(files_in_all)-1
 
 if n_files lt 2 then begin
   message, "No AIA-fits to find jets, check config and input keys."
@@ -22,7 +22,7 @@ endforeach
 ;reading AIA files
 message,'Reading data...',/info
 read_sdo,files_in.ToArray(),ind_seq, data,/silent
-
+n_files = n_elements(ind_seq)
 ;normalizing exposure
 data = float(data); change to double if necessary
 for i=0,n_files-1 do begin
@@ -51,7 +51,7 @@ n_clust = 0
 ctrl = 5
 for i = 0, n-1 do begin
 ;  if i eq 156 then stop
-    pipeline_aia_irc_process, data[*,*,i], run_diff[*, *, i], par1, clusters, i, seed,clust
+    pipeline_aia_irc_process, data[*,*,i], run_diff[*, *, i], par1,clust
     ind = where(clust gt 0)
     if ind[0] ne -1 then begin
       n_clust_cur = max(clust)
