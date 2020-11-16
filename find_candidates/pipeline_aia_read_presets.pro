@@ -8,7 +8,7 @@ if keyword_set(presets_file) then begin
     presets.MIN_SIZE = asu_get_safe_json_key(presets_data, "MIN_SIZE", presets.MIN_SIZE)
     presets.FILL_SIZE = asu_get_safe_json_key(presets_data, "FILL_SIZE", presets.FILL_SIZE)
     presets.MASK_THRESHOLD = asu_get_safe_json_key(presets_data, "MASK_THRESHOLD", presets.MASK_THRESHOLD)
-    presets.BORDER = asu_get_safe_json_key(presets_data, "PASS1_ELLIPSE", presets.PASS1_ELLIPSE)
+    presets.BORDER = asu_get_safe_json_key(presets_data, "BORDER", presets.BORDER)
     
     presets.MIN_AREA = asu_get_safe_json_key(presets_data, "MIN_AREA", presets.MIN_AREA)
     presets.MIN_DURATION = asu_get_safe_json_key(presets_data, "MIN_DURATION", presets.MIN_DURATION)
