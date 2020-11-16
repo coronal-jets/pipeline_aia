@@ -23,6 +23,7 @@ if n_files lt 2 then begin
 endif
 
 ;reading AIA files
+message,'Reading data...',/info
 read_sdo,files_in.ToArray(),ind_seq, data,/silent
 
 ;normalizing exposure
@@ -33,8 +34,9 @@ for i=0,n_files-1 do begin
 endfor
 ;running difference
 run_diff = data[*,*,1:*] - data[*,*,0:-2]
-;Free memory used for the original AIA data
-data =0.
+data = (data[*,*,1:*] + data[*,*,0:-2])*0.5
+
+
 
 
 par1 = presets.par1
@@ -46,9 +48,22 @@ n = szr[3]
 postponed = list()
 postID = 0
 
+sz = size(data)
+clust3d = intarr(sz[1], sz[2], sz[3])
+n_clust = 0
 ctrl = 5
 for i = 0, n-1 do begin
-    pipeline_aia_irc_process, run_diff[*, *, i], par1, clusters, i
+;  if i eq 156 then stop
+    pipeline_aia_irc_process, data[*,*,i], run_diff[*, *, i], par1, clusters, i, seed,clust
+    ind = where(clust gt 0)
+    if ind[0] ne -1 then begin
+      n_clust_cur = max(clust)
+      clust[ind] += n_clust
+      n_clust = n_clust + n_clust_cur
+      clust3d[*,*,i] = clust
+      
+    endif
+
     for k = 0, n_elements(clusters)-1 do begin
         postponed.Add, {pos:i, ID:postID, cluster:clusters[k]}
         print, '   pos = ' + strcompress(i,/remove_all) + ', ID = ' + strcompress(postID,/remove_all)+ ', ' + pipeline_aia_irc_clust_verbose(clusters[k]) 
@@ -59,10 +74,44 @@ for i = 0, n-1 do begin
         ctrl += 5 
     endif
 endfor
+pipeline_aia_irc_merge_clusters, clust3d
+pipeline_aia_irc_remove_short_clusters, clust3d
+
+; fill found_candidates list
+found_candidates = list()
+
+n_candidates = max(clust3d)
+n_frames = sz[3]
+
+for k =1, n_candidates do begin
+  candidate = list()
+  message,'Processing candidate '+strcompress(k)+" of " +strcompress(n_candidates)+'...',/info
+  for t = 0, n_frames-1 do begin
+    clust = clust3d[*,*,t]
+    if total(clust eq k) gt 0 then begin
+      pipeline_aia_irc_get_cluster_coords, clust, k, x, y
+      pipeline_aia_irc_principale_comps, x, y, vx, vy
+      aspect = vx gt vy ? vx/vy : vy/vx
+      j = {pos:t, x:x, y:y, aspect:aspect[0], clust:k}
+      candidate.add,j
+    endif
+  endfor
+  found_candidates.add, candidate
+endfor
+
+message,'Saving objects...',/info
+prefix = work_dir + path_sep() + obj_dir + path_sep() + strcompress(fix(wave),/remove_all)
+pipeline_aia_csv_output, 42, prefix + '.csv', found_candidates, ind_seq
+prefix = work_dir + path_sep() + obj_dir + path_sep() + strcompress(fix(wave),/remove_all)
+save, filename = prefix + '.sav', found_candidates, aia_lim, rdf_lim, ind_seq
+
+
+
+return
 
 found_candidates = list()
 while ~postponed.IsEmpty() do begin
-    pipeline_aia_irc_process_multi, run_diff, postponed, par2, parcom, jet_seq
+    pipeline_aia_irc_process_multi,data, run_diff, postponed, par2, parcom, jet_seq
     if ~jet_seq.IsEmpty() then found_candidates.Add, jet_seq
 endwhile 
 

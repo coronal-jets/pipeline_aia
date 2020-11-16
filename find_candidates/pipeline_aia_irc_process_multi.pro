@@ -25,7 +25,7 @@ endif
 end
 
 ;----------------------------------------------------------------
-pro pipeline_aia_irc_process_multi, run_diff, postponed, par, parcom, jet
+pro pipeline_aia_irc_process_multi, data, run_diff, postponed, par, parcom, jet
 
 S_BACK = 1
 S_FORWARD = 3
@@ -52,7 +52,7 @@ while curr_pos lt n do begin
             curr_pos--
             stopback = 1
             if curr_pos ge 0 then begin
-                pipeline_aia_irc_process, run_diff[*, *, curr_pos], par, clusters, curr_pos, seed
+                pipeline_aia_irc_process,data[*,*,curr_pos], run_diff[*,*,curr_pos], par, clusters, curr_pos, seed
                 if not clusters.IsEmpty() then begin
                     print, strcompress(fix(curr_pos),/remove_all) + ' back, ' + pipeline_aia_irc_clust_verbose(clusters[0])
                     l_pipeline_aia_irc_post_clear, par, curr_pos, clusters[0], postponed
@@ -81,7 +81,7 @@ while curr_pos lt n do begin
             curr_pos++
             stopforw = 1
             if curr_pos lt n then begin
-                pipeline_aia_irc_process, run_diff[*, *, curr_pos], par, clusters, curr_pos, seed
+                pipeline_aia_irc_process, data[*,*,curr_pos], run_diff[*, *, curr_pos], par, clusters, curr_pos, seed
                 if not clusters.IsEmpty() then begin
                     print, strcompress(fix(curr_pos),/remove_all) + ' forward, ' + pipeline_aia_irc_clust_verbose(clusters[0])
                     l_pipeline_aia_irc_post_clear, par, curr_pos, clusters[0], postponed

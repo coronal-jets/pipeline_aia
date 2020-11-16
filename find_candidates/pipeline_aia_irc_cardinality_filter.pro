@@ -1,4 +1,4 @@
-pro pipeline_aia_irc_cardinality_filter, clust, card, rd = rd
+pro pipeline_aia_irc_cardinality_filter, cmask, clust, card, rd = rd
 
 av = 0
 if keyword_set(rd) then av = mean(rd)
@@ -8,6 +8,7 @@ for k = 1, max(clust) do begin
     if n_elements(index) lt card then begin
         if keyword_set(rd) then rd[index] = av
         clust[index] = 0
+        cmask[index] =0
     endif
 endfor
 

@@ -1,7 +1,7 @@
 pro pipeline_aia_read_presets, presets, presets_file = presets_file 
 
-par1 = {sigma1:2.5, card1:25, sigma2:4.0, border:2, card2:60, ellipse:4.0}
-par2 = {sigma1:2.5, card1:20, sigma2:3.5, border:2, card2:25, ellipse:3.5, crit_dist:15, crit_area:0.3}
+par1 = {sigma1:3.0, card1:400, border:2, ellipse:1.5}
+par2 = {sigma1:3.0, card1:400,  border:2, ellipse:1.5, crit_dist:15, crit_area:0.3}
 parcom = {cadences:6, gap:2}
 
 if keyword_set(presets_file) then begin

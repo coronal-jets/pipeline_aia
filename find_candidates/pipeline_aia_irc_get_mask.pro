@@ -1,10 +1,12 @@
-pro pipeline_aia_irc_get_mask, rd, sigma, cmask
+pro pipeline_aia_irc_get_mask,data, rd, sigma, cmask
 
-av = mean(rd)
-st = stddev(rd)
-sz = size(rd)
-cmask = intarr(sz[1], sz[2]) + 1
-index = where(rd ge av-sigma*st and rd le av+sigma*st)
-cmask[index] = 0
+rd_abs = median(abs(rd)/data,5)
+
+; measuring stdev of a quiet 80% of the image
+n= n_elements(ind)
+st = median(rd_abs)
+
+;therdolding
+cmask = rd_abs gt  (sigma * st)
 
 end
