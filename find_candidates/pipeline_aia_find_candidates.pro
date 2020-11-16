@@ -7,20 +7,17 @@ ts = anytim(config.tstart)
 te = anytim(config.tstop)
 
 files_in_all = file_search(filepath('*.fits', root_dir = work_dir + path_sep() + aia_dir_wave_sel))
+n_files = n_elements(files_in)
+
+if n_files lt 2 then begin
+  message, "No AIA-fits to find jets, check config and input keys."
+endif
+
 files_in = list()
 foreach file_in, files_in_all, i do begin
     tf = pipeline_aia_date_from_filename(file_in, /q_anytim)
     if tf ge ts && tf le te then files_in.Add, file_in
 endforeach
-
-seq = !NULL
-aia_lim = !NULL
-rdf_lim = !NULL
-n_files = n_elements(files_in)
-
-if n_files lt 2 then begin
-    message, "No AIA-fits to find jets, check config and input keys."
-endif
 
 ;reading AIA files
 message,'Reading data...',/info
@@ -60,15 +57,9 @@ for i = 0, n-1 do begin
       n_clust_cur = max(clust)
       clust[ind] += n_clust
       n_clust = n_clust + n_clust_cur
-      clust3d[*,*,i] = clust
-      
+      clust3d[*,*,i] = clust    
     endif
 
-    for k = 0, n_elements(clusters)-1 do begin
-        postponed.Add, {pos:i, ID:postID, cluster:clusters[k]}
-        print, '   pos = ' + strcompress(i,/remove_all) + ', ID = ' + strcompress(postID,/remove_all)+ ', ' + pipeline_aia_irc_clust_verbose(clusters[k]) 
-        postID++
-    endfor
     if double(i)/n*100d gt ctrl then begin
         print, 'find candidates, ' + strcompress(ctrl,/remove_all) + '%'
         ctrl += 5 
@@ -136,7 +127,7 @@ foreach cand, found_candidates, i do begin
 endforeach
 
 prefix = work_dir + path_sep() + obj_dir + path_sep() + strcompress(fix(wave),/remove_all)
-save, filename = prefix + '.sav', found_candidates, aia_lim, rdf_lim, ind_seq
+save, filename = prefix + '.sav', found_candidates,  ind_seq
 if n_elements(found_candidates) gt 0 then begin
     pipeline_aia_csv_output, 42, prefix + '.csv', found_candidates, ind_seq
 endif
