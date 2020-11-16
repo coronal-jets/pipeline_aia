@@ -1,7 +1,5 @@
 pro pipeline_aia_irc_process,data, rd, par,  regions
 
-snaps = list()
-
 pipeline_aia_irc_get_mask,data, rd, par.sigma1, cmask
 PIPELINE_AIA_IRC_MORPH_FILTER, CMASK, par.border
 pipeline_aia_irc_cluster, cmask, 1, clust

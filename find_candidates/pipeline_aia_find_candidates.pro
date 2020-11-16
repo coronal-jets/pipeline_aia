@@ -24,21 +24,19 @@ message,'Reading data...',/info
 read_sdo,files_in.ToArray(),ind_seq, data,/silent
 n_files = n_elements(ind_seq)
 ;normalizing exposure
-data = float(data); change to double if necessary
+data = float(data>1); change to double if necessary
 for i=0,n_files-1 do begin
     exptime = ind_seq[i].exptime
     data[*,*,i] = data[*,*,i]/exptime
 endfor
 ;running difference
 run_diff = data[*,*,1:*] - data[*,*,0:-2]
-data = (data[*,*,1:*] + data[*,*,0:-2])*0.5
+data = ((data[*,*,1:*] + data[*,*,0:-2])*0.5)
 
+;preprocess run_dif
+message,'Preprocessing data...',/info
+pipeline_aia_irc_preprocess_rd, run_diff
 
-
-
-par1 = presets.par1
-par2 = presets.par2
-parcom = presets.parcom
 
 szr = size(run_diff)
 n = szr[3]
@@ -50,8 +48,8 @@ clust3d = intarr(sz[1], sz[2], sz[3])
 n_clust = 0
 ctrl = 5
 for i = 0, n-1 do begin
-;  if i eq 156 then stop
-    pipeline_aia_irc_process, data[*,*,i], run_diff[*, *, i], par1,clust
+ ; if i eq 156 then stop
+    pipeline_aia_irc_process, data[*,*,i], run_diff[*, *, i], presets,clust
     ind = where(clust gt 0)
     if ind[0] ne -1 then begin
       n_clust_cur = max(clust)
@@ -65,16 +63,27 @@ for i = 0, n-1 do begin
         ctrl += 5 
     endif
 endfor
+
 pipeline_aia_irc_merge_clusters, clust3d
 pipeline_aia_irc_renumber_clusters, clust3d
-
+n_candidates = max(clust3d)
+message,strcompress(n_candidates)+" candidates found ",/info
+;stop
 pipeline_aia_irc_remove_short_clusters, clust3d
 pipeline_aia_irc_renumber_clusters, clust3d
+n_candidates = max(clust3d)
+message,strcompress(n_candidates)+" candidates after removing short events ",/info
+
+pipeline_aia_irc_aspect_filter_clusters, clust3d, presets.ellipse
+pipeline_aia_irc_renumber_clusters, clust3d
+n_candidates = max(clust3d)
+message,strcompress(n_candidates)+" candidates after removing events with low aspect ",/info
+
 
 ; fill found_candidates list
 found_candidates = list()
 
-n_candidates = max(clust3d)
+
 n_frames = sz[3]
 
 for k =1, n_candidates do begin

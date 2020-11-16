@@ -38,7 +38,7 @@ message,'Reading data...',/info
 read_sdo,files_in,ind_seq, data_full,/silent
 n_files = n_elements(files_in)
 ;normalizing exposure
-data_full = float(data_full); change to double if necessary
+data_full = float(data_full>1); change to double if necessary
 for i=0,n_files-1 do begin
   exptime = ind_seq[i].exptime
   data_full[*,*,i] = data_full[*,*,i]/exptime
@@ -46,6 +46,12 @@ endfor
 ;running difference
 run_diff = data_full[*,*,1:*] - data_full[*,*,0:-2]
 data_full = (data_full[*,*,1:*] + data_full[*,*,0:-2])*0.5
+
+;preprocess run_dif
+message,'Preprocessing data...',/info
+pipeline_aia_irc_preprocess_rd, run_diff
+
+
 ;setting limits
 aia_lim = minmax(data_full)
 rdf_lim = minmax(sigrange(run_diff))
