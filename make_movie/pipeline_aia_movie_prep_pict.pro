@@ -33,10 +33,24 @@ endelse
 
 l_pipeline_aia_movie_get_scale, 0, 0, ind_seq[0], xstep, xshift, ystep, yshift
 
-pipeline_aia_get_colormaps, wave, aia_lim, cm_aia, rdf_lim, cm_run_diff
- 
-data_prev = !NULL
-;win = window(dimensions = [1000, 500])
+;reading AIA files
+message,'Reading data...',/info
+read_sdo,files_in,ind_seq, data_full,/silent
+n_files = n_elements(files_in)
+;normalizing exposure
+data_full = float(data_full); change to double if necessary
+for i=0,n_files-1 do begin
+  exptime = ind_seq[i].exptime
+  data_full[*,*,i] = data_full[*,*,i]/exptime
+endfor
+;running difference
+run_diff = data_full[*,*,1:*] - data_full[*,*,0:-2]
+data_full = (data_full[*,*,1:*] + data_full[*,*,0:-2])*0.5
+;setting limits
+aia_lim = minmax(data_full)
+rdf_lim = minmax(sigrange(run_diff))
+
+
 
 ;Use Z-buffer for generating plots
 set_plot,'Z'
@@ -47,43 +61,43 @@ device,set_resolution = [1000,500], set_pixel_depth = 24, decomposed =0
 
 ctrl =0.
 n_files = n_elements(files_in)
-foreach file_in, files_in, i do begin
-    read_sdo_silent, file_in, index, data, /use_shared, /uncomp_delete, /hide, /silent 
+foreach file_in, files_in[0:-2], i do begin
     rtitle = ''
-    if data_prev ne !NULL then begin
-        pos = i-1 ; position in run_diff
-        pipeline_aia_irc_run_diff, data, data_prev, rd
-        sz = size(rd)
-        jet = dblarr(sz[1], sz[2])
-        rtitle = ''
-        for k = 0, n_elements(found_candidates)-1 do begin
-            cand = found_candidates[k]
-            for j = 0, n_elements(cand)-1 do begin
-                snap = cand[j]
-                if snap.pos eq pos then begin
-                    card = n_elements(snap.x)
-                    rtitle += ' ' + strcompress(card,/remove_all)
-                    for n = 0, card-1 do begin
-                        jet(snap.x[n], snap.y[n]) = 1
-                    endfor
-                endif    
-            endfor
+
+    pos = i-1 ; position in run_diff
+    rd = run_diff[*,*,i]
+    data = data_full[*,*,i]
+    index = ind_seq[i]
+    sz = size(rd)
+    jet = dblarr(sz[1], sz[2])
+    rtitle = ''
+    for k = 0, n_elements(found_candidates)-1 do begin
+        cand = found_candidates[k]
+        for j = 0, n_elements(cand)-1 do begin
+            snap = cand[j]
+            if snap.pos eq pos then begin
+                card = n_elements(snap.x)
+                rtitle += ' ' + strcompress(card,/remove_all)
+                for n = 0, card-1 do begin
+                    jet(snap.x[n], snap.y[n]) = 1
+                endfor
+            endif    
         endfor
-        
-        jtitle = str_replace(str_replace(index.t_obs, 'T', ' '), 'Z', '')
-        ;win.Erase
-        erase
-        if double(i)/n_files*100d gt ctrl then begin
-            message, 'Preparing movie , ' + strcompress(ctrl,/remove_all) + '%',/info
-            ctrl += 5 
-        endif
-        pipeline_aia_movie_draw, data, rd, jet, win, jtitle, rtitle, xstep, xshift,$
-           ystep, yshift, aia_lim, cm_aia, rdf_lim, cm_run_diff, wave = wave
-        pngfile =  work_dir + path_sep() + vis_data_dir_wave + path_sep() + prefix + "_aia" + string(i, FORMAT = '(I05)') + ".jpg"
-        ;write_png, pngfile, TVRD(/TRUE)
-        if ~keyword_set(nosave) then write_jpeg, pngfile, tvrd(true=1), true =1, quality =100 
+    endfor
+    
+    jtitle = str_replace(str_replace(index.t_obs, 'T', ' '), 'Z', '')
+    ;win.Erase
+    erase
+    if double(i)/n_files*100d gt ctrl then begin
+        message, 'Preparing movie , ' + strcompress(ctrl,/remove_all) + '%',/info
+        ctrl += 5 
     endif
-    data_prev = data
+    pipeline_aia_movie_draw, data, rd, jet,  jtitle, rtitle, xstep, xshift,$
+       ystep, yshift, aia_lim, rdf_lim,  wave = wave
+    pngfile =  work_dir + path_sep() + vis_data_dir_wave + path_sep() + prefix + "_aia" + string(i, FORMAT = '(I05)') + ".jpg"
+    ;write_png, pngfile, TVRD(/TRUE)
+    if ~keyword_set(nosave) then write_jpeg, pngfile, tvrd(true=1), true =1, quality =100 
+
 endforeach
 ;win.Close
 
@@ -136,42 +150,40 @@ for k = 0, n_elements(found_candidates)-1 do begin
     n_files = to - from+1
     for i = from, to do begin
         file_in = files_in[i]
-        read_sdo_silent, file_in, index, data0, /use_shared, /uncomp_delete
-        if data_prev ne !NULL then begin
-            pos = i-1 ; position in run_diff
-            pipeline_aia_irc_run_diff, data0, data_prev, rd
-            data = data0[xbox[0]:xbox[1], ybox[0]:ybox[1]]
-            rd = rd[xbox[0]:xbox[1], ybox[0]:ybox[1]]
-            sz = size(rd)
-            jet = dblarr(sz[1], sz[2])
-            rtitle = ''
-            snap = !NULL
-            for jc = 0, nc-1 do begin
-                if pos eq cand[jc].pos then begin
-                    snap = cand[jc]
-                    break
-                endif  
-            endfor  
-            if snap ne !NULL then begin
-                card = n_elements(snap.x)
-                rtitle = strcompress(card,/remove_all)
-                for n = 0, card-1 do begin
-                    jet(snap.x[n]-xbox[0], snap.y[n]-ybox[0]) = 1
-                endfor
-            endif
-            
-            jtitle = str_replace(str_replace(index.t_obs, 'T', ' '), 'Z', '')
-            erase
-            if double(i - from+1)/n_files*100d gt ctrl then begin
-              message, 'Preparing movie , ' + strcompress(ctrl,/remove_all) + '%',/info
-              ctrl += 5
-            endif
-            pipeline_aia_movie_draw, data, rd, jet, win, jtitle, rtitle, xstep, xshift, ystep, yshift, aia_lim, cm_aia, rdf_lim, cm_run_diff, wave = wave
-            pngfile = vis_data_wave_add + path_sep() + prefix + "_aia" + string(i-from, FORMAT = '(I05)') + ".jpg"
-            ;write_png, pngfile, TVRD(/TRUE)
-            if ~keyword_set(nosave) then write_jpeg, pngfile, tvrd(true=1), true =1, quality =100
+        pos = i-1 ; position in run_diff
+        rd = run_diff[*,*,i]
+        data = data_full[*,*,i]
+        index = ind_seq[i]
+        data = data[xbox[0]:xbox[1], ybox[0]:ybox[1]]
+        rd = rd[xbox[0]:xbox[1], ybox[0]:ybox[1]]
+        sz = size(rd)
+        jet = dblarr(sz[1], sz[2])
+        rtitle = ''
+        snap = !NULL
+        for jc = 0, nc-1 do begin
+            if pos eq cand[jc].pos then begin
+                snap = cand[jc]
+                break
+            endif  
+        endfor  
+        if snap ne !NULL then begin
+            card = n_elements(snap.x)
+            rtitle = strcompress(card,/remove_all)
+            for n = 0, card-1 do begin
+                jet(snap.x[n]-xbox[0], snap.y[n]-ybox[0]) = 1
+            endfor
         endif
-        data_prev = data0
+        
+        jtitle = str_replace(str_replace(index.t_obs, 'T', ' '), 'Z', '')
+        erase
+        if double(i - from+1)/n_files*100d gt ctrl then begin
+          message, 'Preparing movie , ' + strcompress(ctrl,/remove_all) + '%',/info
+          ctrl += 5
+        endif
+        pipeline_aia_movie_draw, data, rd, jet,  jtitle, rtitle, xstep, xshift, ystep, yshift, aia_lim, rdf_lim,  wave = wave
+        pngfile = vis_data_wave_add + path_sep() + prefix + "_aia" + string(i-from, FORMAT = '(I05)') + ".jpg"
+        ;write_png, pngfile, TVRD(/TRUE)
+        if ~keyword_set(nosave) then write_jpeg, pngfile, tvrd(true=1), true =1, quality =100
     endfor
     
 endfor
