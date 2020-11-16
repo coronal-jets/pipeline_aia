@@ -66,7 +66,10 @@ for i = 0, n-1 do begin
     endif
 endfor
 pipeline_aia_irc_merge_clusters, clust3d
+pipeline_aia_irc_renumber_clusters, clust3d
+
 pipeline_aia_irc_remove_short_clusters, clust3d
+pipeline_aia_irc_renumber_clusters, clust3d
 
 ; fill found_candidates list
 found_candidates = list()
@@ -94,7 +97,7 @@ message,'Saving objects...',/info
 prefix = work_dir + path_sep() + obj_dir + path_sep() + strcompress(fix(wave),/remove_all)
 pipeline_aia_csv_output, 42, prefix + '.csv', found_candidates, ind_seq
 prefix = work_dir + path_sep() + obj_dir + path_sep() + strcompress(fix(wave),/remove_all)
-save, filename = prefix + '.sav', found_candidates, aia_lim, rdf_lim, ind_seq
+save, filename = prefix + '.sav', found_candidates,  ind_seq
 
 
 
