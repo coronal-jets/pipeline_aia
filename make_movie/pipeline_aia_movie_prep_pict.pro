@@ -35,7 +35,7 @@ l_pipeline_aia_movie_get_scale, 0, 0, ind_seq[0], xstep, xshift, ystep, yshift
 
 ;reading AIA files
 message,'Reading data...',/info
-read_sdo,files_in,ind_seq, data_full,/silent
+read_sdo,files_in,ind_seq, data_full,/silent,/use_shared
 n_files = n_elements(files_in)
 ;normalizing exposure
 data_full = float(data_full>1); change to double if necessary

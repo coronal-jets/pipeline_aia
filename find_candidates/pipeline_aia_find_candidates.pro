@@ -21,7 +21,7 @@ endforeach
 
 ;reading AIA files
 message,'Reading data...',/info
-read_sdo,files_in.ToArray(),ind_seq, data,/silent
+read_sdo,files_in.ToArray(),ind_seq, data,/silent,/use_shared
 n_files = n_elements(ind_seq)
 ;normalizing exposure
 data = float(data>1); change to double if necessary
