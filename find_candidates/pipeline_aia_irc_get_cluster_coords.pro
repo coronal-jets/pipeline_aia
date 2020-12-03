@@ -7,7 +7,7 @@ xt = intarr(n_elements(clust))
 yt = intarr(n_elements(clust))
 
 sz = size(clust)
-cnt = 0
+cnt = 0l
 for kx = 0, sz[1]-1 do begin
     for ky = 0, sz[2]-1 do begin
         if clust[kx, ky] eq k then begin
