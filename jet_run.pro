@@ -1,9 +1,9 @@
 pro jet_run
 
   pipeline_aia_all $
-    , config_file = dialog_pickfile(title = "Select jet configuration file") $
+    , config_file = dialog_pickfile(title = "Select jet configuration file",filter=['config*.json','*.json']) $
     , presets_file = dialog_pickfile(title = "Select presets file",$
-                    file = 'presets_std.json')$
+                    filter=['presets*.json','*.json'])$
     , fps = 5
 
 end
