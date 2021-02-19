@@ -1,6 +1,10 @@
 pro pipeline_aia_read_presets, presets, presets_file = presets_file 
 
-presets = {MIN_SIZE:2, FILL_SIZE:15, MASK_THRESHOLD:3.0, BORDER:2, MIN_AREA:400, MIN_DURATION:10,MIN_ASPECT:2.0}
+pipeline_aia_read_presets_m0, presets0, presets_file = presets_file 
+
+presets = {MIN_SIZE:2, FILL_SIZE:15, MASK_THRESHOLD:3.0, BORDER:2, MIN_AREA:400, MIN_DURATION:10, MIN_ASPECT:2.0 $ ; SA method (1)
+          ,par1:presets0.par1, par2:presets0.par2, parcom:presets0.parcom $ ; for AS method (0)
+          }
 
 if keyword_set(presets_file) then begin
     presets_data = asu_read_json_config(presets_file)

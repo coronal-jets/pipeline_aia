@@ -1,9 +1,19 @@
-pro pipeline_aia_dir_tree, work_dir, config, aia_dir_cache, aia_wave_sel_rel, objects_rel, vis_data_rel, vis_data_wave_rel, cache_dir = cache_dir
+pro pipeline_aia_dir_tree, work_dir, config, aia_dir_cache, event_rel, aia_wave_sel_rel, objects_rel, vis_data_rel, vis_data_wave_rel, cache_dir = cache_dir, method = method
 
-time = stregex(config.tstart,'([0-9]+)-([0-9]+)-([0-9]+) ([0-9]+):([0-9]+):([0-9]+)',/subexpr,/extract)
-time_rel = time[1] + time[2] + time[3] + '_' + time[4] + time[5] + time[6]
-time = stregex(config.tstop,'([0-9]+)-([0-9]+)-([0-9]+) ([0-9]+):([0-9]+):([0-9]+)',/subexpr,/extract)
-time_rel = time_rel + '_' + time[1] + time[2] + time[3] + '_' + time[4] + time[5] + time[6]
+;time = stregex(config.tstart,'([0-9]+)-([0-9]+)-([0-9]+) ([0-9]+):([0-9]+):*([0-9]*)',/subexpr,/extract)
+;if time[6] eq '' then time[6] = '00' 
+;time_rel = time[1] + time[2] + time[3] + '_' + time[4] + time[5] + time[6]
+;time = stregex(config.tstop,'([0-9]+)-([0-9]+)-([0-9]+) ([0-9]+):([0-9]+):*([0-9]*)',/subexpr,/extract)
+;if time[6] eq '' then time[6] = '00' 
+;time_rel = time_rel + '_' + time[1] + time[2] + time[3] + '_' + time[4] + time[5] + time[6]
+
+time = anytim(config.tstart, out_style = 'UTC_EXT')
+time_rel = string(time.year,FORMAT = '(I04)') + string(time.month,FORMAT='(I02)') + string(time.day,FORMAT='(I02)') + '_' $
+         + string(time.hour,FORMAT = '(I02)') + string(time.minute,FORMAT='(I02)') + string(time.second,FORMAT='(I02)')
+time = anytim(config.tstop, out_style = 'UTC_EXT')
+time_rel += '_' + string(time.year,FORMAT = '(I04)') + string(time.month,FORMAT='(I02)') + string(time.day,FORMAT='(I02)') + '_' $
+                + string(time.hour,FORMAT = '(I02)') + string(time.minute,FORMAT='(I02)') + string(time.second,FORMAT='(I02)')
+
 event_rel = time_rel $
     + '_' + strcompress(fix(config.xc),/remove_all) + '_' + strcompress(fix(config.yc),/remove_all) $ 
     + '_' + strcompress(fix(config.wpix),/remove_all) + '_' + strcompress(fix(config.hpix),/remove_all) 
@@ -19,12 +29,14 @@ file_mkdir, aia_dir_cache
 event_dir = work_dir + path_sep() + event_rel
 file_mkdir, event_dir
 
+if (n_elements(method) > 0) && (method eq 0) then smeth = '_m0' else smeth = '_m1'
+
 aia_dir_rel = event_rel + path_sep() + 'aia_data'
 file_mkdir, work_dir + path_sep() + aia_dir_rel
-objects_rel = event_rel + path_sep() + 'objects'
+objects_rel = event_rel + path_sep() + 'objects' + smeth
 objects = work_dir + path_sep() + objects_rel
 file_mkdir, objects 
-vis_data_rel = event_rel + path_sep() + 'visual_data'
+vis_data_rel = event_rel + path_sep() + 'visual_data' + smeth
 vis_data = work_dir + path_sep() + vis_data_rel
 file_mkdir, vis_data
 

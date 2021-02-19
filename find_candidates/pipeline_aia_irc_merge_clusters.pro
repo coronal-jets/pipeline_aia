@@ -1,5 +1,5 @@
 pro pipeline_aia_irc_merge_clusters, clust
-  message,"Merging clustters...",/info
+  message,"Merging clusters...",/info
   sz = size(clust)
   nt = sz[3]
   

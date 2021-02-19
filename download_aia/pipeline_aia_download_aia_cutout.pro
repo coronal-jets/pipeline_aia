@@ -1,9 +1,7 @@
-pro pipeline_aia_download_aia_cutout, wave, save_dir, config_file = config_file, down_message = down_message
+pro pipeline_aia_download_aia_cutout, wave, save_dir, config, down_message = down_message
 compile_opt idl2
 
 t0 = systime(/seconds)
-
-pipeline_aia_read_down_config, config, config_file = config_file
 
 ts = anytim(config.tstart)
 te = anytim(config.tstop)
@@ -23,8 +21,15 @@ if (swave eq '1600') or (swave eq '1700') then begin
   ds = 'aia.lev1_euv_24s'
 endif
 
-
-
+;time = stregex(config.tstart,'([0-9]+)-([0-9]+)-([0-9]+).*',/subexpr,/extract)
+;Rctr = asu_solar_radius(fix(time[1]), fix(time[2]), fix(time[3])) - 15
+time = anytim(config.tstart, out_style = 'UTC_EXT')
+Rctr = asu_solar_radius(time.year, time.month, time.day) - 15
+Robs = sqrt(config.xc^2 + config.yc^2)
+if Robs gt Rctr then begin
+    config.xc *= Rctr/Robs 
+    config.yc *= Rctr/Robs 
+endif   
 
 query = jsoc_get_query(ds,config.tstart, config.tstop,swave,segment='image', $
   processing=processing, t_ref=config.tref, x=config.xc, y=config.yc,$
@@ -37,7 +42,7 @@ message,msg,/info
 
 
 message,'downloding with aria2...',/info
-aria2_urls, urls, save_dir
+aria2_urls_rand, urls, save_dir
 message,'downlod complete',/info
 
 return

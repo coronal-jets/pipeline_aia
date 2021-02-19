@@ -20,7 +20,7 @@ compile_opt idl2
   size_px = [config.wpix, config.hpix]
   pos = config
   Robs = sqrt(pos.xc^2 + pos.yc^2)
-  Rctr = index_in.rsun_obs - 5
+  Rctr = index_in.rsun_obs - 15
   if Robs gt Rctr then begin
     pos.xc *= Rctr/Robs 
     pos.yc *= Rctr/Robs 
@@ -84,11 +84,9 @@ end
 ;end
 
 
-pro pipeline_aia_cutout, aia_dir_cache, work_dir, wave, aia_dir_wave_sel, config_file = config_file, nofits = nofits, sav = sav
+pro pipeline_aia_cutout, aia_dir_cache, work_dir, wave, aia_dir_wave_sel, config, nofits = nofits, sav = sav
     t0 = systime(/seconds)
    
-    pipeline_aia_read_down_config, config, config_file = config_file 
-
     pipeline_aia_get_query, wave, config.tstart, config.tstop, urls, filenames
 
     n_files = n_elements(filenames)

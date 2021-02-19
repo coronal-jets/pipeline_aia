@@ -1,9 +1,7 @@
-pro pipeline_aia_download_aia_full, wave, aia_dir_cache, config_file = config_file, down_message = down_message
+pro pipeline_aia_download_aia_full, wave, aia_dir_cache, config, down_message = down_message, downlist = downlist
 compile_opt idl2
 
 t0 = systime(/seconds)
-
-pipeline_aia_read_down_config, config, config_file = config_file
 
 ts = anytim(config.tstart)
 te = anytim(config.tstop)
@@ -11,6 +9,12 @@ n_frames = (te-ts)/12
 
 t0 = systime(/seconds)
 n_done = 0
+
+outresult = 0 
+if arg_present(downlist) ne 0 then begin
+    outresult = 1
+    downlist = list()
+endif    
 
 postponed = list()
 post_n = 0
@@ -47,6 +51,7 @@ foreach url, urls, j do begin
         endelse    
         break
     endif else begin
+        if outresult ne 0 then downlist.Add, {url:url, filename:filename}
         curr_time = systime(1)
         time_download = curr_time - time_download_started
         parse = stregex(filenames[j],'.*AIA(.*)',/subexpr,/extract)
@@ -77,6 +82,7 @@ for j = 0, n_elements(postponed)-1 do begin
         endif    
     endfor
     if status eq 0 then message, "Postponed downloads failed, session stopped"
+    if status ne 0 && outresult ne 0 then downlist.Add, {url:url, filename:filename}
 endfor
 
 message, strcompress(string(systime(/seconds)-t0,format="('download performed in ',g0,' seconds')")), /cont

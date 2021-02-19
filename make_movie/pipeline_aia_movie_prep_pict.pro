@@ -8,12 +8,19 @@ yshift = (y - ind.CRPIX2)*ind.CDELT2 + ind.CRVAL2
 
 end
 
-pro pipeline_aia_movie_prep_pict, work_dir, obj_dir, wave, aia_dir_wave_sel, vis_data_dir_wave, details, config_file = config_file, no_save_empty = no_save_empty
+pro pipeline_aia_movie_prep_pict, work_dir, obj_dir, wave, aia_dir_wave_sel, vis_data_dir_wave, details, config, files_in $
+                                , use_jpg = use_jpg, use_contour = use_contour, no_save_empty = no_save_empty, graphtype = graphtype
 
-pipeline_aia_read_down_config, config, config_file = config_file 
-prefix = pipeline_aia_get_vis_prefix(config_file = config_file)
+if n_elements(graphtype) eq 0 then graphtype = 1
+if n_elements(use_contour) eq 0 then use_contour = 0
+extns = '.png'
+if use_jpg then extns = '.jpg'
 
-files_in = file_search(filepath('*.fits', root_dir = work_dir + path_sep() + aia_dir_wave_sel))
+windim = [1600, 800]
+
+prefix = pipeline_aia_get_vis_prefix(config)
+
+;files_in = file_search(filepath('*.fits', root_dir = work_dir + path_sep() + aia_dir_wave_sel))
 cand_mask = strcompress(fix(wave),/remove_all) + '.sav'
 file_cand = file_search(filepath(cand_mask, root_dir = work_dir + path_sep() + obj_dir))
 curr_seq = !NULL
@@ -33,41 +40,33 @@ endelse
 
 l_pipeline_aia_movie_get_scale, 0, 0, ind_seq[0], xstep, xshift, ystep, yshift
 
-;reading AIA files
-message,'Reading data...',/info
-read_sdo,files_in,ind_seq, data_full,/silent,/use_shared
-n_files = n_elements(files_in)
-;normalizing exposure
-data_full = float(data_full>1); change to double if necessary
-for i=0,n_files-1 do begin
-  exptime = ind_seq[i].exptime
-  data_full[*,*,i] = data_full[*,*,i]/exptime
-endfor
-;running difference
-run_diff = data_full[*,*,1:*] - data_full[*,*,0:-2]
-data_full = (data_full[*,*,1:*] + data_full[*,*,0:-2])*0.5
-
-;preprocess run_dif
-message,'Preprocessing data...',/info
-pipeline_aia_irc_preprocess_rd, run_diff
-
+pipeline_aia_read_prepare_data, files_in, run_diff, data_full, ind_seq
 
 ;setting limits
 aia_lim = minmax(data_full)
 rdf_lim = minmax(sigrange(run_diff))
 
+if (n_elements(graphtype) gt 0) && (graphtype eq 0) then begin
+    win = window(dimensions = windim)
+    pipeline_aia_get_colormaps, wave, aia_lim, cm_aia, rdf_lim, cm_run_diff
+    graphtype = 0
+endif else begin    
+    ;Use Z-buffer for generating plots
+    set_plot,'Z'
+    device,set_resolution = windim, set_pixel_depth = 24, decomposed =0
+    !p.color = 0
+    !p.background = 255
+    !p.charsize=1.5
+    cm_aia = !NULL
+    cm_run_diff = !NULL
+    graphtype = 1
+endelse
 
-
-;Use Z-buffer for generating plots
-set_plot,'Z'
-device,set_resolution = [1000,500], set_pixel_depth = 24, decomposed =0
-!p.color = 0
-!p.background = 255
-!p.charsize=1.5
 
 ctrl =0.
 n_files = n_elements(files_in)
-foreach file_in, files_in[0:-2], i do begin
+szrd = size(run_diff)
+foreach file_in, files_in[0:szrd[3]-1], i do begin
     rtitle = ''
 
     pos = i-1 ; position in run_diff
@@ -92,21 +91,28 @@ foreach file_in, files_in[0:-2], i do begin
     endfor
     
     jtitle = str_replace(str_replace(index.t_obs, 'T', ' '), 'Z', '')
-    ;win.Erase
-    erase
+        
     if double(i)/n_files*100d gt ctrl then begin
         message, 'Preparing movie , ' + strcompress(ctrl,/remove_all) + '%',/info
         ctrl += 5 
     endif
-    pipeline_aia_movie_draw, data, rd, jet,  jtitle, rtitle, xstep, xshift,$
-       ystep, yshift, aia_lim, rdf_lim,  wave = wave
-    pngfile =  work_dir + path_sep() + vis_data_dir_wave + path_sep() + prefix + "_aia" + string(i, FORMAT = '(I05)') + ".jpg"
-    ;write_png, pngfile, TVRD(/TRUE)
-    if ~keyword_set(nosave) then write_jpeg, pngfile, tvrd(true=1), true =1, quality =100 
-
+    outfile =  work_dir + path_sep() + vis_data_dir_wave + path_sep() + prefix + "_aia" + string(i, FORMAT = '(I05)') + extns
+    if graphtype eq 0 then begin
+        win.Erase
+        pipeline_aia_movie_draw_m0, data, rd, jet, win, jtitle, rtitle, xstep, xshift, ystep, yshift, aia_lim, cm_aia, rdf_lim, cm_run_diff, use_contour
+        if ~keyword_set(nosave) then win.Save, outfile, width = windim[0], height = windim[1], bit_depth = 2 
+    endif else begin
+        erase
+        pipeline_aia_movie_draw, data, rd, jet,  jtitle, rtitle, xstep, xshift,$
+           ystep, yshift, aia_lim, rdf_lim,  wave = wave
+        if ~keyword_set(nosave) then begin
+            if use_jpg then write_jpeg, outfile, tvrd(true=1), true =1, quality =100 $
+            else write_png, outfile, tvrd(true=1)
+        endif 
+    endelse
 endforeach
-;win.Close
 
+if graphtype eq 0 then win.Close
 
 frames_prev = 6
 frames_post = 3
@@ -144,11 +150,13 @@ for k = 0, n_elements(found_candidates)-1 do begin
     ybox[1] = min([ind_seq[0].naxis2-1, ybox[1]+yexpand])  
     
     l_pipeline_aia_movie_get_scale, xbox[0], ybox[0], ind_seq[0], xstep, xshift, ystep, yshift
-    from = max([1, cand[0].pos-frames_prev])
-    to = min([cand[nc-1].pos+frames_post, n_elements(files_in)-1])
+    from = max([0, cand[0].pos-frames_prev])
+    to = min([cand[nc-1].pos+frames_post, n_elements(files_in)-2])
     data_prev = !NULL
 
-    detname = "detail" + string(k+1, FORMAT = '(I02)')
+    if graphtype eq 0 then win = window(dimensions = windim)
+    
+    detname = "detail" + string(k+1, FORMAT = '(I04)')
     details.Add, detname 
     vis_data_wave_add = work_dir + path_sep() + vis_data_dir_wave + path_sep() + detname
     file_mkdir, vis_data_wave_add
@@ -181,17 +189,28 @@ for k = 0, n_elements(found_candidates)-1 do begin
         endif
         
         jtitle = str_replace(str_replace(index.t_obs, 'T', ' '), 'Z', '')
-        erase
         if double(i - from+1)/n_files*100d gt ctrl then begin
           message, 'Preparing movie , ' + strcompress(ctrl,/remove_all) + '%',/info
           ctrl += 5
         endif
-        pipeline_aia_movie_draw, data, rd, jet,  jtitle, rtitle, xstep, xshift, ystep, yshift, aia_lim, rdf_lim,  wave = wave
-        pngfile = vis_data_wave_add + path_sep() + prefix + "_aia" + string(i-from, FORMAT = '(I05)') + ".jpg"
-        ;write_png, pngfile, TVRD(/TRUE)
-        if ~keyword_set(nosave) then write_jpeg, pngfile, tvrd(true=1), true =1, quality =100
+        outfile = vis_data_wave_add + path_sep() + prefix + "_aia" + string(i-from, FORMAT = '(I05)') + extns
+        if graphtype eq 0 then begin
+            win.Erase
+            pipeline_aia_movie_draw_m0, data, rd, jet, win, jtitle, rtitle, xstep, xshift, ystep, yshift, aia_lim, cm_aia, rdf_lim, cm_run_diff, use_contour
+            if ~keyword_set(nosave) then win.Save, outfile, width = windim[0], height = windim[1], bit_depth = 2 
+        endif else begin 
+            erase
+            pipeline_aia_movie_draw, data, rd, jet,  jtitle, rtitle, xstep, xshift, ystep, yshift, aia_lim, rdf_lim,  wave = wave
+            if ~keyword_set(nosave) then begin
+                if use_jpg then write_jpeg, outfile, tvrd(true=1), true =1, quality =100 $
+                else write_png, outfile, tvrd(true=1)
+            endif 
+        endelse
     endfor
+
+    if graphtype eq 0 and win ne !NULL then win.Close
     
 endfor
-set_plot,'X'
+
+; set_plot,'X'
 end
