@@ -110,5 +110,6 @@ pro pipeline_aia_cutout, aia_dir_cache, work_dir, wave, aia_dir_wave_sel, config
         cnt++
     endforeach
   
-    message, strcompress(string(systime(/seconds)-t0,format="('cutoff performed in ',g0,' seconds')")), /cont
+;    message, strcompress(string(systime(/seconds)-t0,format="('cutoff performed in ',g0,' seconds')")), /cont
+    message, 'cutoff performed in ' + asu_sec2hms(systime(/seconds)-t0, /issecs), /cont
 end

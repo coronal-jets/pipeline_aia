@@ -1,4 +1,4 @@
-pro pipeline_aia_find_candidates, work_dir, aia_dir_wave_sel, wave, obj_dir, config, files_in, presets_file = presets_file
+function pipeline_aia_find_candidates, work_dir, aia_dir_wave_sel, wave, obj_dir, config, files_in, presets_file = presets_file
 
 t0 = systime(/seconds)
 pipeline_aia_read_presets, presets, presets_file = presets_file 
@@ -6,7 +6,9 @@ pipeline_aia_read_presets, presets, presets_file = presets_file
 pipeline_aia_get_input_files, config, work_dir + path_sep() + aia_dir_wave_sel, files_in
 pipeline_aia_read_prepare_data, files_in.ToArray(), run_diff, data, ind_seq
 
-message, strcompress(string(systime(/seconds)-t0,format="('******** CANDIDATES: preparation in ',g0,' seconds')")), /cont
+;message, strcompress(string(systime(/seconds)-t0,format="('******** CANDIDATES: preparation in ',g0,' seconds')")), /cont
+message, '******** CANDIDATES: preparation in ' + asu_sec2hms(systime(/seconds)-t0, /issecs), /info
+
 t0 = systime(/seconds)
 
 szr = size(run_diff)
@@ -33,28 +35,32 @@ for i = 0, n-1 do begin
         ctrl += 5 
     endif
 endfor
-message, strcompress(string(systime(/seconds)-t0,format="('******** CANDIDATES: finding in ',g0,' seconds')")), /cont
+;message, strcompress(string(systime(/seconds)-t0,format="('******** CANDIDATES: finding in ',g0,' seconds')")), /cont
+message, '******** CANDIDATES: finding in ' + asu_sec2hms(systime(/seconds)-t0, /issecs), /info
 
 t0 = systime(/seconds)
 pipeline_aia_irc_merge_clusters, clust3d
 pipeline_aia_irc_renumber_clusters, clust3d
 n_candidates = max(clust3d)
 message,strcompress(n_candidates)+" candidates found ",/info
-message, strcompress(string(systime(/seconds)-t0,format="('******** CANDIDATES: found in ',g0,' seconds')")), /cont
+;message, strcompress(string(systime(/seconds)-t0,format="('******** CANDIDATES: found in ',g0,' seconds')")), /cont
+message, '******** CANDIDATES: found in ' + asu_sec2hms(systime(/seconds)-t0, /issecs), /info
 
 t0 = systime(/seconds)
 pipeline_aia_irc_remove_short_clusters, clust3d, presets.min_duration
 pipeline_aia_irc_renumber_clusters, clust3d
 n_candidates = max(clust3d)
 message,strcompress(n_candidates)+" candidates after removing short events ",/info
-message, strcompress(string(systime(/seconds)-t0,format="('******** CANDIDATES: removing short in ',g0,' seconds')")), /cont
+;message, strcompress(string(systime(/seconds)-t0,format="('******** CANDIDATES: removing short in ',g0,' seconds')")), /cont
+message, '******** CANDIDATES: removing short clusters ' + asu_sec2hms(systime(/seconds)-t0, /issecs), /info
 
 t0 = systime(/seconds)
 pipeline_aia_irc_aspect_filter_clusters, clust3d, total_aspects, presets.min_aspect
 pipeline_aia_irc_renumber_clusters, clust3d
 n_candidates = max(clust3d)
 message,strcompress(n_candidates)+" candidates after removing events with low aspect ",/info
-message, strcompress(string(systime(/seconds)-t0,format="('******** CANDIDATES: removing low aspects in ',g0,' seconds')")), /cont
+;message, strcompress(string(systime(/seconds)-t0,format="('******** CANDIDATES: removing low aspects in ',g0,' seconds')")), /cont
+message, '******** CANDIDATES: removing low aspect clusters ' + asu_sec2hms(systime(/seconds)-t0, /issecs), /info
 
 ; fill found_candidates list
 found_candidates = list()
@@ -77,7 +83,8 @@ for k =1, n_candidates do begin
   endfor
   found_candidates.add, candidate
 endfor
-message, strcompress(string(systime(/seconds)-t0,format="('******** CANDIDATES: reported in ',g0,' seconds')")), /cont
+;message, strcompress(string(systime(/seconds)-t0,format="('******** CANDIDATES: reported in ',g0,' seconds')")), /cont
+message, '******** CANDIDATES: reported in ' + asu_sec2hms(systime(/seconds)-t0, /issecs), /info
 
 message,'Saving objects...',/info
 prefix = work_dir + path_sep() + obj_dir + path_sep() + strcompress(fix(wave),/remove_all)
@@ -85,9 +92,7 @@ pipeline_aia_csv_output, prefix + '.csv', found_candidates, ind_seq
 prefix = work_dir + path_sep() + obj_dir + path_sep() + strcompress(fix(wave),/remove_all)
 save, filename = prefix + '.sav', found_candidates,  ind_seq
 
-
-
-return
+return, found_candidates.Count()
 
 
 ;    mask_3d = clust eq k

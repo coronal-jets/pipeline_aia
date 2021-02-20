@@ -1,20 +1,21 @@
 pro jettests
 
-pipeline_aia_all $
-    , config_file = 's:\Projects\IDLWork\pipeline_aia\config20160428.json' $
-    ;, cache_dir = 'd:\UCache\Jets' $ ; does not need for remote_cutout
-    ;, /no_load $
-    ;, /no_cut $
+v = pipeline_aia_all( $
+    config_file = 's:\Projects\IDLWork\pipeline_aia\config20160428.json' $
+;    , cache_dir = 'd:\UCache\Jets' $ ; does not need for remote_cutout
+;    , /no_load $
+;    , /no_cut $
 ;    , remote_cutout = 1 $
 ;    , waves = [171, 193, 211, 304] $
 ;    , maxtime = 8 $
-    , use_jpg = 0 $
+;    , use_jpg = 0 $
 ;    , harc = 300 $
 ;    , warc = 300 $
-;    , use_contour = 0 $
+;    , use_contour = 1 $
 ;    , fps = 5 $
 ;    , method = 1 $
 ;    , graphtype = 1
-    , work_dir = 'd:\UData\Jets\Collection'
+    , work_dir = 'd:\UData\Jets\Collection' $
+        )
 
 end

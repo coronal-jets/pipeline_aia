@@ -62,7 +62,7 @@ foreach url, urls, j do begin
             passed = curr_time - t0
             est = passed/part
             rem = est-passed
-            if rem lt 24*60*60 then asu_sec2remain, rem, remains
+            if rem lt 24*60*60 then remains = asu_sec2hms(rem, /issecs)
         endif
         if status eq 1 then message,/info, "Wave " + swave + ": " + fname + " downloaded succesfully in "+strcompress(time_download)+" seconds, est. remains " + remains
         if status eq 2 then message,/info, "Wave " + swave + ": " + fname + " is already present, est. remains " + remains
@@ -85,7 +85,8 @@ for j = 0, n_elements(postponed)-1 do begin
     if status ne 0 && outresult ne 0 then downlist.Add, {url:url, filename:filename}
 endfor
 
-message, strcompress(string(systime(/seconds)-t0,format="('download performed in ',g0,' seconds')")), /cont
+;message, strcompress(string(systime(/seconds)-t0,format="('download performed in ',g0,' seconds')")), /cont
+message, 'downlod complete in ' + asu_sec2hms(systime(/seconds)-t0, /issecs), /info
   
 end
 

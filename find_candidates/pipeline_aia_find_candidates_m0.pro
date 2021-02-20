@@ -1,4 +1,4 @@
-pro pipeline_aia_find_candidates_m0, work_dir, aia_dir_wave_sel, wave, obj_dir, config, files_in, presets_file = presets_file
+function pipeline_aia_find_candidates_m0, work_dir, aia_dir_wave_sel, wave, obj_dir, config, files_in, presets_file = presets_file
 
 pipeline_aia_read_presets, presets, presets_file = presets_file 
 
@@ -68,5 +68,7 @@ save, filename = prefix + '.sav', found_candidates, aia_lim, rdf_lim, ind_seq
 if n_elements(found_candidates) gt 0 then begin
     pipeline_aia_csv_output, prefix + '.csv', found_candidates, ind_seq
 endif
+
+return, found_candidates.Count()
  
 end
