@@ -21,10 +21,9 @@ for k = 1, max(clust) do begin
     endif
     found = 0
     if n_elements(x) gt par.card2 then begin
-        pipeline_aia_irc_principale_comps, x, y, vx, vy
-        aspect = vx gt vy ? vx/vy : vy/vx
-        j = {pos:pos, x:x, y:y, aspect:aspect, clust:k}
-        if aspect gt par.ellipse then found = 1
+        pipeline_aia_irc_principale_comps, x, y, vx, vy, vbeta = vbeta, rotx = rotx, roty = roty, caspect = caspect, baspect = baspect
+        j = {pos:pos, x:x, y:y, aspect:caspect, baspect:baspect, vbeta:vbeta, rotx:rotx, roty:roty, clust:k, totasp:0}
+        if caspect gt par.ellipse then found = 1
     endif
     
     if found then begin
