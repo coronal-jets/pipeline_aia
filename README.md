@@ -20,4 +20,4 @@ Downloads AIA/data from JSOC, find jet-like occurencies and prepares a movie.
 	* batch mode implemented, to provide batch execution of config's set.
 * 20 February 2021: polishing, console reports improved, including times
 * 22 February 2021: bugfixing (crash at AS method candidates save), default preset values changed
-
+* 23 February 2021: small improvement of service utitly
