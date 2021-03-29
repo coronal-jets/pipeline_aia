@@ -1,7 +1,6 @@
-function pipeline_aia_find_candidates, work_dir, aia_dir_wave_sel, wave, obj_dir, config, files_in, presets_file = presets_file
+function pipeline_aia_find_candidates, work_dir, aia_dir_wave_sel, wave, obj_dir, config, files_in, presets
 
 t0 = systime(/seconds)
-pipeline_aia_read_presets, presets, presets_file = presets_file 
 
 pipeline_aia_get_input_files, config, work_dir + path_sep() + aia_dir_wave_sel, files_in
 pipeline_aia_read_prepare_data, files_in.ToArray(), run_diff, data, ind_seq

@@ -1,6 +1,4 @@
-function pipeline_aia_find_candidates_m0, work_dir, aia_dir_wave_sel, wave, obj_dir, config, files_in, presets_file = presets_file
-
-pipeline_aia_read_presets, presets, presets_file = presets_file 
+function pipeline_aia_find_candidates_m0, work_dir, aia_dir_wave_sel, wave, obj_dir, config, files_in, presets
 
 pipeline_aia_get_input_files, config, work_dir + path_sep() + aia_dir_wave_sel, files_in
 

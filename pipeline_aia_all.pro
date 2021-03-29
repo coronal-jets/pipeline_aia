@@ -3,7 +3,8 @@
 function pipeline_aia_all, config_file = config_file, work_dir = work_dir, cache_dir = cache_dir, presets_file = presets_file $
                     , fps = fps, no_load = no_load, no_cut = no_cut, no_save_empty = no_save_empty, remote_cutout= remote_cutout $
                     , method = method, graphtype = graphtype, maxtime = maxtime, waves = waves $
-                    , warc = warc, harc = harc, use_jpg = use_jpg, use_contour = use_contour 
+                    , warc = warc, harc = harc, use_jpg = use_jpg, use_contour = use_contour $
+                    , test = test 
 
 cand_report = list()
 tt = systime(/seconds)
@@ -11,15 +12,20 @@ if n_elements(remote_cutout) eq 0 then remote_cutout = 1 ; use remote cutout by 
 if n_elements(method) eq 0 then method = 1
 if n_elements(use_jpg) eq 0 then use_jpg = 0
 
+pipeline_aia_read_presets, presets, presets_file = presets_file 
 pipeline_aia_read_down_config, config, config_file = config_file, waves = waves, warc = warc, harc = harc 
 if not keyword_set(work_dir) then cd, current = work_dir
-pipeline_aia_dir_tree, work_dir, config, aia_dir_cache, event_rel, aia_dir_wave_sel, obj_dir, vis_data_dir, vis_data_dir_wave, cache_dir = cache_dir, method = method
+pipeline_aia_dir_tree, work_dir, config, aia_dir_cache, event_rel, aia_dir_wave_sel, obj_dir, vis_data_dir, vis_data_dir_wave $
+                     , cache_dir = cache_dir, method = method, test = test
 
 if ~pipeline_aia_check_dates(config, work_dir+path_sep()+event_rel, maxtime = maxtime) then begin
     print, '******** PROGRAM FINISHED ABNORMALLY, CHECK TIMES IN CONFIG! ********'
     message, 'Incorrect times in config'
     return, cand_report
 endif
+
+asu_json_save_list, config, work_dir + path_sep() + obj_dir + path_sep() + 'config.json'
+asu_json_save_list, presets, work_dir + path_sep() + obj_dir + path_sep() + 'presets.json'
 
 foreach wave, config.waves, i do begin
     t0 = systime(/seconds)
@@ -32,11 +38,11 @@ foreach wave, config.waves, i do begin
     endelse
     ;message, strcompress(string(systime(/seconds)-t0,format="('******** DOWNLOAD/CUTOFF performed in ',g0,' seconds')")), /cont
     message, '******** DOWNLOAD/CUTOFF performed in ' + asu_sec2hms(systime(/seconds)-t0, /issecs), /info
-    if ~keyword_set(method) then begin
-        ncand = pipeline_aia_find_candidates_m0(work_dir, aia_dir_wave_sel[i], wave, obj_dir, config, files_in, presets_file = presets_file)
-    endif else begin    
-        ncand = pipeline_aia_find_candidates(work_dir, aia_dir_wave_sel[i], wave, obj_dir, config, files_in, presets_file = presets_file)
-    endelse
+    case method of
+        0: ncand = pipeline_aia_find_candidates_m0(work_dir, aia_dir_wave_sel[i], wave, obj_dir, config, files_in, presets)
+        1: ncand = pipeline_aia_find_candidates(work_dir, aia_dir_wave_sel[i], wave, obj_dir, config, files_in, presets)
+        2: ncand = pipeline_aia_find_candidates_m2(work_dir, aia_dir_wave_sel[i], wave, obj_dir, config, files_in, presets)
+    endcase
     cand_report.Add, {wave:wave, ncand:ncand}    
     t0 = systime(/seconds)
     pipeline_aia_movie_prep_pict, work_dir, obj_dir, wave, aia_dir_wave_sel[i], vis_data_dir_wave[i], details, config, files_in.ToArray() $

@@ -1,4 +1,5 @@
-pro pipeline_aia_dir_tree, work_dir, config, aia_dir_cache, event_rel, aia_wave_sel_rel, objects_rel, vis_data_rel, vis_data_wave_rel, cache_dir = cache_dir, method = method
+pro pipeline_aia_dir_tree, work_dir, config, aia_dir_cache, event_rel, aia_wave_sel_rel, objects_rel, vis_data_rel, vis_data_wave_rel $
+                         , cache_dir = cache_dir, method = method, test = test
 
 ;time = stregex(config.tstart,'([0-9]+)-([0-9]+)-([0-9]+) ([0-9]+):([0-9]+):*([0-9]*)',/subexpr,/extract)
 ;if time[6] eq '' then time[6] = '00' 
@@ -29,14 +30,16 @@ file_mkdir, aia_dir_cache
 event_dir = work_dir + path_sep() + event_rel
 file_mkdir, event_dir
 
-if (n_elements(method) > 0) && (method eq 0) then smeth = '_m0' else smeth = '_m1'
+if (n_elements(method) gt 0) && (method eq 0) then smeth = '_m0' else smeth = '_m1'
+
+prefix = n_elements(test) gt 0 ? asu_now_to_filename() + path_sep() : ''
 
 aia_dir_rel = event_rel + path_sep() + 'aia_data'
 file_mkdir, work_dir + path_sep() + aia_dir_rel
-objects_rel = event_rel + path_sep() + 'objects' + smeth
+objects_rel = event_rel + path_sep() + prefix + 'objects' + smeth
 objects = work_dir + path_sep() + objects_rel
 file_mkdir, objects 
-vis_data_rel = event_rel + path_sep() + 'visual_data' + smeth
+vis_data_rel = event_rel + path_sep() + prefix + 'visual_data' + smeth
 vis_data = work_dir + path_sep() + vis_data_rel
 file_mkdir, vis_data
 
