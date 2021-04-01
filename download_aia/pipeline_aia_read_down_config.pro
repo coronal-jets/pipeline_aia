@@ -1,4 +1,4 @@
-pro pipeline_aia_read_down_config, config, config_file = config_file, waves = waves, warc = warc, harc = harc
+pro pipeline_aia_read_down_config, config, method, config_file = config_file, waves = waves, warc = warc, harc = harc
 
 if not keyword_set(config_file) then config_file = "config.json"
 
@@ -7,6 +7,7 @@ config_data = asu_read_json_config(config_file)
 config = {tstart:config_data["TIME_START"], tstop:config_data["TIME_STOP"], tref:config_data["TIME_START"] $
         , xc:config_data["X_CENTER"], yc:config_data["Y_CENTER"], wpix:300, hpix:300 $
         , waves:config_data["WAVES"] $
+        , method:method $
         , timeout:3, count:3, limit:30, timeout_post:5, count_post:3}
 
 if n_elements(waves) ne 0 then begin

@@ -25,3 +25,4 @@ Downloads AIA/data from JSOC, find jet-like occurencies and prepares a movie.
 	* keyword 'test', if specified, creates additional subdirectory for objects and visualizations;
 	* 'config' and 'presets' (modified ones, if have been modified) are stored in objects subdirectory;
 	* works on 3D morph/dilation started
+* 01 April 2021: major implementation, MM3D (morphology in 3D (x-y-time) space) introduced

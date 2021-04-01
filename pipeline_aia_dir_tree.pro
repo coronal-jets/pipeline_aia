@@ -30,7 +30,7 @@ file_mkdir, aia_dir_cache
 event_dir = work_dir + path_sep() + event_rel
 file_mkdir, event_dir
 
-if (n_elements(method) gt 0) && (method eq 0) then smeth = '_m0' else smeth = '_m1'
+smeth = '_m' + strcompress(string(method), /remove_all)
 
 prefix = n_elements(test) gt 0 ? asu_now_to_filename() + path_sep() : ''
 

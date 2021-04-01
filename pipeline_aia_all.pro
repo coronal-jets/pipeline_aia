@@ -9,11 +9,11 @@ function pipeline_aia_all, config_file = config_file, work_dir = work_dir, cache
 cand_report = list()
 tt = systime(/seconds)
 if n_elements(remote_cutout) eq 0 then remote_cutout = 1 ; use remote cutout by default
-if n_elements(method) eq 0 then method = 1
+if n_elements(method) eq 0 then method = 2
 if n_elements(use_jpg) eq 0 then use_jpg = 0
 
 pipeline_aia_read_presets, presets, presets_file = presets_file 
-pipeline_aia_read_down_config, config, config_file = config_file, waves = waves, warc = warc, harc = harc 
+pipeline_aia_read_down_config, config, method, config_file = config_file, waves = waves, warc = warc, harc = harc 
 if not keyword_set(work_dir) then cd, current = work_dir
 pipeline_aia_dir_tree, work_dir, config, aia_dir_cache, event_rel, aia_dir_wave_sel, obj_dir, vis_data_dir, vis_data_dir_wave $
                      , cache_dir = cache_dir, method = method, test = test

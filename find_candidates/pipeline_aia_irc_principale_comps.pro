@@ -1,6 +1,17 @@
 pro pipeline_aia_irc_principale_comps, x0, y0, vx, vy, caspect = caspect, vbeta = vbeta, rotx = rotx, roty = roty, baspect = baspect
 
+caspect = 1d
+vbeta = 0d
+rotx = x0
+roty = y0
+baspect = 1d
+
 n = n_elements(x0)
+if n le 1 then return
+if n_elements(uniq(x0, sort(x0))) eq 1 || n_elements(uniq(y0, sort(y0))) eq 1 then begin
+;    stophere = 1;
+    return
+endif
 
 x = double(x0)
 y = double(y0)
@@ -31,6 +42,9 @@ vy = sqrt(sb^2*x2 - 2*sb*cb*xy + cb^2*y2)/n
 
 if arg_present(caspect) then begin
     caspect = vx gt vy ? vx/vy : vy/vx
+;    if ~finite(caspect) then begin
+;        stophere = 1;
+;    endif
 endif
 
 if arg_present(rotx) or arg_present(roty) or arg_present(baspect) then begin
