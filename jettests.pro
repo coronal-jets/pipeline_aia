@@ -6,6 +6,7 @@ v = pipeline_aia_all( $
 ;    , /no_load $
 ;    , /no_cut $
 ;    , /remote_cutout $
+;    , /ref_images $
 ;    , waves = [171, 193, 211, 304] $
 ;    , maxtime = 8 $
 ;    , /use_jpg $

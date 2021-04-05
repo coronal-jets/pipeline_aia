@@ -1,4 +1,4 @@
-pro pipeline_aia_download_aia_cutout, wave, save_dir, config, down_message = down_message
+function pipeline_aia_download_aia_cutout, wave, save_dir, config, down_message = down_message
 compile_opt idl2
 
 ts = anytim(config.tstart)
@@ -37,7 +37,7 @@ message,'downloading with aria2...',/info
 aria2_urls_rand, urls, save_dir
 message, 'download complete', /info
 
-return
+return, {ts:ts, te:te}
   
 end
 
