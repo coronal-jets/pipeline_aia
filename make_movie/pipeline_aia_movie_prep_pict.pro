@@ -11,7 +11,7 @@ end
 pro pipeline_aia_movie_prep_pict, work_dir, obj_dir, wave, aia_dir_wave_sel, vis_data_dir_wave, details, config, files_in $
                                 , use_jpg = use_jpg, use_contour = use_contour, no_save_empty = no_save_empty, graphtype = graphtype
 
-if n_elements(graphtype) eq 0 then graphtype = 1
+if n_elements(graphtype) eq 0 then graphtype = 0
 if n_elements(use_contour) eq 0 then use_contour = 1
 extns = '.png'
 if use_jpg then extns = '.jpg'

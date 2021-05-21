@@ -1,11 +1,12 @@
-pro pipeline_aia_download_aia_full, wave, aia_dir_cache, config, down_message = down_message, downlist = downlist
+pro pipeline_aia_download_aia_full, wave, save_dir, config, dirmode = dirmode, down_message = down_message, downlist = downlist
 compile_opt idl2
 
 t0 = systime(/seconds)
 
+delt = wave gt 1000 ? 12 : 6
 ts = anytim(config.tstart)
 te = anytim(config.tstop)
-n_frames = (te-ts)/12
+n_frames = (te-ts)/delt
 
 t0 = systime(/seconds)
 n_done = 0
@@ -27,10 +28,15 @@ foreach url, urls, j do begin
     if keyword_set(down_message) then message, /info, "Wave " + swave + ": downloading "+filenames[j]+" from "+url+'...'
     
     date = pipeline_aia_date_from_filename(filenames[j])
-    date_dir = aia_dir_cache + path_sep() + date
-    wave_dir = date_dir + path_sep() + swave
-    file_mkdir, wave_dir
-
+    
+    if n_elements(dirmode) eq 0 || dirmode eq 'cache' then begin
+        date_dir = save_dir + path_sep() + date
+        wave_dir = date_dir + path_sep() + swave
+        file_mkdir, wave_dir
+    endif else begin
+        wave_dir = save_dir
+    endelse
+        
     filename = wave_dir + path_sep() + filenames[j]
     
     for itry = 1, config.count do begin
@@ -86,7 +92,7 @@ for j = 0, n_elements(postponed)-1 do begin
 endfor
 
 ;message, strcompress(string(systime(/seconds)-t0,format="('download performed in ',g0,' seconds')")), /cont
-message, 'downlod complete in ' + asu_sec2hms(systime(/seconds)-t0, /issecs), /info
+message, 'download complete in ' + asu_sec2hms(systime(/seconds)-t0, /issecs), /info
   
 end
 

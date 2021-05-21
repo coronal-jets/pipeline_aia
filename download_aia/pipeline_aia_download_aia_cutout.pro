@@ -37,7 +37,7 @@ message,'downloading with aria2...',/info
 aria2_urls_rand, urls, save_dir
 message, 'download complete', /info
 
-return, {ts:ts, te:te}
+return, [ts, te]
   
 end
 

@@ -5,16 +5,12 @@ t0 = systime(/seconds)
 pipeline_aia_get_input_files, config, work_dir + path_sep() + aia_dir_wave_sel, files_in
 pipeline_aia_read_prepare_data, files_in.ToArray(), run_diff, data, ind_seq
 
-;message, strcompress(string(systime(/seconds)-t0,format="('******** CANDIDATES: preparation in ',g0,' seconds')")), /cont
 message, '******** CANDIDATES: preparation in ' + asu_sec2hms(systime(/seconds)-t0, /issecs), /info
 
 t0 = systime(/seconds)
 
 szr = size(run_diff)
 n = szr[3]
-
-;sz = size(data)
-;clust3d = lonarr(sz[1], sz[2], sz[3])
 
 pipeline_aia_irc_get_mask_3d, run_diff, presets.mask_threshold, cmask
 
