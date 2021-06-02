@@ -33,7 +33,7 @@ clust3d = label_region(cmask, all_neighbors = 1)
 n_candidates = max(clust3d)
 message,strcompress(n_candidates)+" candidates initially ",/info
 
-pipeline_aia_irc_cardinality_filter, cmask, clust3d, presets.min_area
+pipeline_aia_irc_cardinality_filter, cmask, clust3d, presets.min_area*presets.min_duration
 pipeline_aia_irc_renumber_clusters, clust3d
 n_candidates = max(clust3d)
 message,strcompress(n_candidates)+" candidates after cardinality ",/info
@@ -47,7 +47,7 @@ message,strcompress(n_candidates)+" candidates after removing short events ",/in
 message, '******** CANDIDATES: removing short clusters ' + asu_sec2hms(systime(/seconds)-t0, /issecs), /info
 
 t0 = systime(/seconds)
-pipeline_aia_irc_aspect_filter_clusters, clust3d, total_aspects, presets.min_aspect
+pipeline_aia_irc_aspect_filter_clusters, clust3d, presets.min_aspect, presets.min_aspect_area, presets.min_aspect_3d 
 pipeline_aia_irc_renumber_clusters, clust3d
 n_candidates = max(clust3d)
 message,strcompress(n_candidates)+" candidates after removing events with low aspect ",/info
@@ -61,24 +61,16 @@ n_frames = sz[3]
 
 t0 = systime(/seconds)
 for k =1, n_candidates do begin
-    candidate = list()
     message,'Processing candidate '+strcompress(k)+" of " +strcompress(n_candidates)+'...',/info
-    for t = 0, n_frames-1 do begin
-        clust = clust3d[*,*,t]
-        if total(clust eq k) gt 0 then begin
-            pipeline_aia_irc_get_cluster_coords, clust, k, x, y
-            pipeline_aia_irc_principale_comps, x, y, vx, vy, vbeta = vbeta, rotx = rotx, roty = roty, caspect = caspect, baspect = baspect
-            j = {pos:t, x:x, y:y, aspect:caspect, baspect:baspect, vbeta:vbeta, rotx:rotx, roty:roty, clust:k, totasp:total_aspects[k]}
-            candidate.add,j
-        endif
-    endfor
-    found_candidates.add, candidate
+    candidate = list()
+    OK = pipeline_aia_irc_get_aspects_clusters(clust3d, k, presets.min_aspect, presets.min_aspect_area, presets.min_aspect_3d, max_aspect_2d, aspect_3d, candidate = candidate)
+    if OK then found_candidates.add, candidate
 endfor
 message, '******** CANDIDATES: reported in ' + asu_sec2hms(systime(/seconds)-t0, /issecs), /info
 
 message,'Saving objects...',/info
 prefix = work_dir + path_sep() + obj_dir + path_sep() + strcompress(fix(wave),/remove_all)
-pipeline_aia_csv_output, prefix + '.csv', found_candidates, ind_seq
+pipeline_aia_csv_output, prefix + '.csv', found_candidates, ind_seq, presets = presets
 prefix = work_dir + path_sep() + obj_dir + path_sep() + strcompress(fix(wave),/remove_all)
 save, filename = prefix + '.sav', found_candidates,  ind_seq
 

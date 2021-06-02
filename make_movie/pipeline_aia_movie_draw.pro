@@ -8,6 +8,8 @@ sz = size(data)
 x = findgen(sz[1])*xstep+xshift
 y = findgen(sz[2])*ystep+yshift
 !p.multi = [2,2,1]
+
+device, decomposed = 0
 aia_lct_silent,wave = wave,/load
 implot,comprange(data,2,/global),x,y,/iso,title = jtitle
 
@@ -17,6 +19,7 @@ rd = rd>rdf_lim[0]<rdf_lim[1]
 loadct,0,/silent
 implot, rd,x,y,/iso,title = rtitle
 
+device, decomposed = 1
 contour, gauss_smooth(jet,3,/edge_truncate),x,y, levels =[0.05],/overplot, color = 'FF0000'x, thick =2
 
 !p.multi = 0

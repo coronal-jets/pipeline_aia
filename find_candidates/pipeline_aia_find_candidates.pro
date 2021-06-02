@@ -54,6 +54,9 @@ message,strcompress(n_candidates)+" candidates after removing short events ",/in
 message, '******** CANDIDATES: removing short clusters ' + asu_sec2hms(systime(/seconds)-t0, /issecs), /info
 
 t0 = systime(/seconds)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; NB! Interface is changed!
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 pipeline_aia_irc_aspect_filter_clusters, clust3d, total_aspects, presets.min_aspect
 pipeline_aia_irc_renumber_clusters, clust3d
 n_candidates = max(clust3d)

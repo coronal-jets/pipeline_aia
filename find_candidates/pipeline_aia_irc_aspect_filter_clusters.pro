@@ -1,17 +1,13 @@
-pro pipeline_aia_irc_aspect_filter_clusters, clust, total_aspects, aspect_threshold
+pro pipeline_aia_irc_aspect_filter_clusters, clust, aspect_threshold_2d, min_aspect_area, aspect_threshold_3d
 
 message,"Filtering clusters by aspect...",/info
-if n_elements(aspect_threshold) eq 0 then aspect_threshold = 4.0
 n = max(clust)
-total_aspects = dblarr(n+1)
-for k=1, n do begin
-    mask_3d = clust eq k
-    ind = where(mask_3d)
-    mask = total(mask_3d,3) gt 0
-    pipeline_aia_irc_get_cluster_coords, mask, 1, x, y
-    pipeline_aia_irc_principale_comps, x, y, vx, vy, caspect = caspect
-    total_aspects[k] = caspect
-    if caspect lt aspect_threshold then begin
+sz = size(clust)
+for k = 1, n do begin
+    OK = pipeline_aia_irc_get_aspects_clusters(clust, k, aspect_threshold_2d, min_aspect_area, aspect_threshold_3d, max_aspect_2d, aspect_3d)
+    if ~OK then begin
+        mask_3d = clust eq k
+        ind = where(mask_3d)
         clust[ind] = 0
     endif
 endfor

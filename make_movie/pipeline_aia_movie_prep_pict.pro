@@ -74,7 +74,7 @@ foreach file_in, files_in[0:szrd[3]-1], i do begin
     data = data_full[*,*,i]
     index = ind_seq[i]
     sz = size(rd)
-    jet = dblarr(sz[1], sz[2])
+    jet = lonarr(sz[1], sz[2])
     rtitle = ''
     for k = 0, n_elements(found_candidates)-1 do begin
         cand = found_candidates[k]
@@ -82,9 +82,9 @@ foreach file_in, files_in[0:szrd[3]-1], i do begin
             snap = cand[j]
             if snap.pos eq pos then begin
                 card = n_elements(snap.x)
-                rtitle += ' ' + strcompress(card,/remove_all)
+                rtitle += ' ' + strcompress(k+1,/remove_all) + '(' + strcompress(card,/remove_all) + ')' ; + aspect?
                 for n = 0, card-1 do begin
-                    jet(snap.x[n], snap.y[n]) = 1
+                    jet(snap.x[n], snap.y[n]) = snap.clust
                 endfor
             endif    
         endfor
@@ -117,7 +117,7 @@ if graphtype eq 0 then win.Close
 frames_prev = 6
 frames_post = 3
 expandk = 1.4
-minview = 15
+minview = 70
 
 details = list()
 for k = 0, n_elements(found_candidates)-1 do begin
@@ -182,7 +182,7 @@ for k = 0, n_elements(found_candidates)-1 do begin
         endfor  
         if snap ne !NULL then begin
             card = n_elements(snap.x)
-            rtitle = strcompress(card,/remove_all)
+            rtitle += ' ' + strcompress(k+1,/remove_all) + "(" + strcompress(card,/remove_all) + ", " + strcompress(string(snap.aspect, FORMAT = '(F6.1)'),/remove_all) + ")"
             for n = 0, card-1 do begin
                 jet(snap.x[n]-xbox[0], snap.y[n]-ybox[0]) = 1
             endfor

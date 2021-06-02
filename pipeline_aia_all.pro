@@ -1,7 +1,7 @@
 ; Main entry to Jet Analyzer
 
 function pipeline_aia_all, config_file = config_file, work_dir = work_dir, cache_dir = cache_dir, presets_file = presets_file $
-                    , fps = fps, no_load = no_load, no_cut = no_cut, no_save_empty = no_save_empty $
+                    , fps = fps, no_load = no_load, no_cut = no_cut, no_save_empty = no_save_empty, no_visual = no_visual $
                     , remote_cutout= remote_cutout, ref_images = ref_images $
                     , method = method, graphtype = graphtype, maxtime = maxtime, waves = waves $
                     , warc = warc, harc = harc, use_jpg = use_jpg, use_contour = use_contour $
@@ -31,15 +31,16 @@ asu_json_save_list, presets, work_dir + path_sep() + obj_dir + path_sep() + 'pre
 
 foreach wave, config.waves, i do begin
     t0 = systime(/seconds)
-    if keyword_set(remote_cutout) && ~keyword_set(no_load) then begin
-        save_dir = work_dir + path_sep() + aia_dir_wave_sel[i]
-        if ref_images then begin
-            save_dir_full = save_dir + path_sep() + 'fullimage'
-            file_mkdir, save_dir_full
-            pipeline_aia_download_aia_full_selected, wave, save_dir_full, config
+    if keyword_set(remote_cutout) then begin
+        if ~keyword_set(no_load) then begin
+            save_dir = work_dir + path_sep() + aia_dir_wave_sel[i]
+            if ref_images then begin
+                save_dir_full = save_dir + path_sep() + 'fullimage'
+                file_mkdir, save_dir_full
+                pipeline_aia_download_aia_full_selected, wave, save_dir_full, config
+            endif
+            lims = pipeline_aia_download_aia_cutout(wave, save_dir, config)
         endif
-        lims = pipeline_aia_download_aia_cutout(wave, save_dir, config)
-;        pipeline_aia_download_aia_ref, wave, save_dir, config, lims
     endif else begin
       if ~keyword_set(no_load) then pipeline_aia_download_aia_full, wave, aia_dir_cache, config, dirmode = 'cache'
       if ~keyword_set(no_cut) then pipeline_aia_cutout, aia_dir_cache, work_dir, wave, aia_dir_wave_sel[i], config, nofits = nofits, sav = sav
@@ -50,12 +51,14 @@ foreach wave, config.waves, i do begin
         1: ncand = pipeline_aia_find_candidates(work_dir, aia_dir_wave_sel[i], wave, obj_dir, config, files_in, presets)
         2: ncand = pipeline_aia_find_candidates_m2(work_dir, aia_dir_wave_sel[i], wave, obj_dir, config, files_in, presets)
     endcase
-    cand_report.Add, {wave:wave, ncand:ncand}    
-    t0 = systime(/seconds)
-    pipeline_aia_movie_prep_pict, work_dir, obj_dir, wave, aia_dir_wave_sel[i], vis_data_dir_wave[i], details, config, files_in.ToArray() $
-                                , use_jpg = use_jpg, use_contour = use_contour, no_save_empty = no_save_empty, graphtype = graphtype
-    message, '******** PICTURES prepared in ' + asu_sec2hms(systime(/seconds)-t0, /issecs), /info
-    pipeline_aia_make_movie, wave, vis_data_dir_wave[i], vis_data_dir, details, work_dir, config, use_jpg = use_jpg, fps = fps
+    cand_report.Add, {wave:wave, ncand:ncand}
+    if ~keyword_set(no_visual) then begin   
+        t0 = systime(/seconds)
+        pipeline_aia_movie_prep_pict, work_dir, obj_dir, wave, aia_dir_wave_sel[i], vis_data_dir_wave[i], details, config, files_in.ToArray() $
+                                    , use_jpg = use_jpg, use_contour = use_contour, no_save_empty = no_save_empty, graphtype = graphtype
+        message, '******** PICTURES prepared in ' + asu_sec2hms(systime(/seconds)-t0, /issecs), /info
+        pipeline_aia_make_movie, wave, vis_data_dir_wave[i], vis_data_dir, details, work_dir, config, use_jpg = use_jpg, fps = fps
+    endif
 endforeach
 
 print, '******** PROGRAM FINISHED SUCCESSFULLY, found: ', pipeline_aia_cand_report(cand_report), ' in ', asu_sec2hms(systime(/seconds)-t0, /issecs), ' ********'

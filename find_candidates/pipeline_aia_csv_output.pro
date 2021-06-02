@@ -1,8 +1,10 @@
-pro pipeline_aia_csv_output, filename, candlist, aiaseq 
+pro pipeline_aia_csv_output, filename, candlist, aiaseq, presets = presets
+
+if n_elements(presets) eq 0 then mincard = 0 else mincard = presets.MIN_AREA
 
 openw, fnum, filename, /GET_LUN
 
-printf, fnum, 'T start', 'T max', 'T end', '#', 'Duration', 'Max. cardinality', 'Jet aspect ratio', 'Max. aspect ratio', 'LtoW aspect ratio', 'Total length', 'Av. width', 'X from', 'X to', 'Y from', 'Y to', $
+printf, fnum, 'T start', 'T max', 'T end', '#', 'Duration', 'Max. cardinality', 'Jet aspect ratio', 'Max. aspect ratio', 'LtoW aspect ratio', 'Speed est.', 'Total length', 'Av. width', 'X from', 'X to', 'Y from', 'Y to', $
      FORMAT = '(%"%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s")'
 
 for i = 0, n_elements(candlist)-1 do begin
@@ -11,7 +13,7 @@ for i = 0, n_elements(candlist)-1 do begin
     tmax = !NULL
     tend = !NULL
     maxcard = 0
-    maxasp = !NULL
+    maxasp = 0
     xmin = !NULL
     xmax = !NULL
     sy2 = 0d
@@ -37,7 +39,6 @@ for i = 0, n_elements(candlist)-1 do begin
         if xbox eq !NULL then begin
             xbox = xarc
             ybox = yarc
-            maxasp = clust.aspect
             xmin = min(clust.rotx)
             xmax = max(clust.rotx)
         endif
@@ -51,8 +52,12 @@ for i = 0, n_elements(candlist)-1 do begin
         ybox[1] = max([ybox[1], yarc[1]])
         maxcard = max([maxcard, n_elements(clust.x)], imax)
         if imax eq 1 then tmax = aiaseq[pos].date_obs
-        maxasp = max([maxasp, clust.aspect])
+        if finite(clust.aspect) && n_elements(clust.x) ge mincard then maxasp = max([maxasp, clust.aspect])
     endfor
+    
+    dx = mean(jet[0].x) - mean(jet[n_elements(jet)-1].x)
+    dy = mean(jet[0].y) - mean(jet[n_elements(jet)-1].y)
+    moving = sqrt(dx^2 + dy^2)/(n_elements(jet)-1) * 0.6d*725d/12d
     
     avw = sqrt(sy2/ntot)
     totlng = xmax-xmin
@@ -61,8 +66,8 @@ for i = 0, n_elements(candlist)-1 do begin
     dmin = wsec/60
     dsec = wsec - dmin*60
     dur = string(dmin, "'", dsec, '"', FORMAT = '(I, A, I02, A)') 
-    printf, fnum, tstart, tmax, tend, i+1, dur, maxcard, clust[0].totasp, maxasp, asplng, totlng, avw, xbox[0], xbox[1], ybox[0], ybox[1] $
-          , FORMAT = '(%"%s, %s, %s, %d, %s, %d, %5.2f, %5.2f, %5.2f, %6.1f, %6.1f, %7.1f, %7.1f, %7.1f, %7.1f")'
+    printf, fnum, tstart, tmax, tend, i+1, dur, maxcard, clust[0].totasp, maxasp, asplng, moving, totlng, avw, xbox[0], xbox[1], ybox[0], ybox[1] $
+          , FORMAT = '(%"%s, %s, %s, %d, %s, %d, %5.2f, %5.2f, %5.2f, %6.0f, %6.1f, %6.1f, %7.1f, %7.1f, %7.1f, %7.1f")'
 endfor    
 
 close, fnum
