@@ -11,7 +11,7 @@ end
 pro pipeline_aia_movie_prep_pict, work_dir, obj_dir, wave, aia_dir_wave_sel, vis_data_dir_wave, details, config, files_in $
                                 , use_jpg = use_jpg, use_contour = use_contour, no_save_empty = no_save_empty, graphtype = graphtype
 
-if n_elements(graphtype) eq 0 then graphtype = 0
+if n_elements(graphtype) eq 0 then graphtype = 1
 if n_elements(use_contour) eq 0 then use_contour = 1
 extns = '.png'
 if use_jpg then extns = '.jpg'
@@ -20,7 +20,6 @@ windim = [1600, 800]
 
 prefix = pipeline_aia_get_vis_prefix(config)
 
-;files_in = file_search(filepath('*.fits', root_dir = work_dir + path_sep() + aia_dir_wave_sel))
 cand_mask = strcompress(fix(wave),/remove_all) + '.sav'
 file_cand = file_search(filepath(cand_mask, root_dir = work_dir + path_sep() + obj_dir))
 curr_seq = !NULL
@@ -46,7 +45,7 @@ pipeline_aia_read_prepare_data, files_in, run_diff, data_full, ind_seq
 aia_lim = minmax(data_full)
 rdf_lim = minmax(sigrange(run_diff))
 
-if (n_elements(graphtype) gt 0) && (graphtype eq 0) then begin
+if graphtype eq 0 then begin
     win = window(dimensions = windim)
     pipeline_aia_get_colormaps, wave, aia_lim, cm_aia, rdf_lim, cm_run_diff
     graphtype = 0

@@ -2,7 +2,7 @@
 
 function pipeline_aia_all, config_file = config_file, work_dir = work_dir, cache_dir = cache_dir, presets_file = presets_file $
                     , fps = fps, no_load = no_load, no_cut = no_cut, no_save_empty = no_save_empty, no_visual = no_visual $
-                    , remote_cutout= remote_cutout, ref_images = ref_images $
+                    , remote_cutout = remote_cutout, ref_images = ref_images $
                     , method = method, graphtype = graphtype, maxtime = maxtime, waves = waves $
                     , warc = warc, harc = harc, use_jpg = use_jpg, use_contour = use_contour $
                     , test = test 
