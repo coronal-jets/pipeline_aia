@@ -27,3 +27,10 @@ Downloads AIA/data from JSOC, find jet-like occurencies and prepares a movie.
 	* works on 3D morph/dilation started
 * 01 April 2021: major implementation, MM3D (morphology in 3D (x-y-time) space) introduced
 * 05 April 2021: download reference full images (for start, mid, end moments) implemented
+* 21 May 2021: Improvement for full images download
+* 02 June 2021: Update for final using
+* 10 June 2021:
+	* Small changes in contour;
+	* Presets changed;
+	* Parameters polishing;
+	* Config improvement
