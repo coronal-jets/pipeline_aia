@@ -1,8 +1,10 @@
 pro jettests_batch
 
-pipeline_aia_all_batch $
-    , config_path = 'd:\UData\Jets\testbatch' $
-;    , cache_dir = 'd:\UCache\Jets' $ ; does not need for remote_cutout
+vntot = pipeline_aia_all_batch( $
+      config_path = '/home/stupishin/coronal_jets/Configs' $
+    , work_dir = '/home/stupishin/coronal_jets/Jets' $
+;    , presets_file = '/home/stupishin/idl/lib/pipeline_aia/presets_std.json' $     
+;    , cache_dir = '/home/stupishin/coronal_jets/Cache' $ ; does not need for remote_cutout
 ;    , /no_load $
 ;    , /no_cut $
 ;    , /remote_cutout $
@@ -17,6 +19,6 @@ pipeline_aia_all_batch $
 ;    , fps = 5 $
 ;    , method = 1 $
 ;    , /test $
-    , work_dir = 'd:\UData\Jets\CollectionBatch'
-
+    )
+    
 end

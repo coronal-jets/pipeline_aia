@@ -34,3 +34,4 @@ Downloads AIA/data from JSOC, find jet-like occurencies and prepares a movie.
 	* Presets changed;
 	* Parameters polishing;
 	* Config improvement
+* 21 June 2021: polishing, call examples

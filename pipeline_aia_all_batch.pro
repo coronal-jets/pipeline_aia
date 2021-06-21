@@ -3,7 +3,7 @@ pro l_pipeline_aia_all_batch_report, U, config_file, t0, i, ntot
           , ' performed in ', asu_sec2hms(systime(/seconds)-t0, /issecs)
 end
 
-pro pipeline_aia_all_batch, config_path = config_path, _extra = _extra
+function pipeline_aia_all_batch, config_path = config_path, _extra = _extra
 
 configs = file_search(filepath('config*.json', root_dir = config_path))
 
@@ -45,5 +45,7 @@ close, U
 FREE_LUN, U
 
 print, '******** BATCH FINISHED SUCCESSFULLY in ', stamp, ' ********'
-                          
+   
+return, vntot   
+                      
 end
