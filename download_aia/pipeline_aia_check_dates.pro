@@ -8,7 +8,7 @@ te = anytim(config.tstop)
 cond = 0
 if te-ts le 0 then cond = 1
 if cond eq 0 then begin
-    if te-ts gt maxtime*60*60 then cond = 2
+    if te-ts gt maxtime*60d*60d then cond = 2
 endif
 
 if cond ne 0 then begin
