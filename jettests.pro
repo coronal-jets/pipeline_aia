@@ -1,8 +1,10 @@
 pro jettests
 
 v = pipeline_aia_all( $
-      config_file = '/home/stupishin/coronal_jets/Configs/config20190417_080700.json' $
-    , work_dir = '/home/stupishin/coronal_jets/Jets-3' $
+;      config_file = 's:\University\Work\Jets\ConfigsToChange\config20150918_095100.json' $
+      config_file = 's:\University\Work\Jets\ConfigsToChange\config20141004_100500.json' $
+      
+    , work_dir = 'g:\BIGData\UData\Jets\FromConfToChange' $
 ;    , presets_file = '/home/stupishin/idl/lib/pipeline_aia/presets_std.json' $     
 ;    , cache_dir = '/home/stupishin/coronal_jets/Cache' $ ; does not need for remote_cutout
 ;    , /no_load $
