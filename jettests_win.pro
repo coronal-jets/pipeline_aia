@@ -1,15 +1,29 @@
 pro jettests_win
 
 v = pipeline_aia_all( $
-      config_file = 's:\University\Work\Jets\ConfigsToChange\config20141004_100500.json' $
-    , work_dir = 'g:\BIGData\UData\Jets\FromConfToChange' $
-;    , presets_file = '/home/stupishin/idl/lib/pipeline_aia/presets_std.json' $     
+      config_file = 'g:\BIGData\UData\Jets\Devl_20211110\Configs\config20141004_100500.json' $
+;      config_file = 'g:\BIGData\UData\Jets\Devl_20211110\Configs\config20120705_031800.json' $
+;      config_file = 'g:\BIGData\UData\Jets\Devl_20211110\Configs\config20150510_181600.json' $
+               
+;      config_file = 'g:\BIGData\UData\Jets\Devl_20211110\Configs\config20100604_091600.json' $
+;      config_file = 'g:\BIGData\UData\Jets\Devl_20211110\Configs\config20100620_110400.json' $
+;      config_file = 'g:\BIGData\UData\Jets\Devl_20211110\Configs\config20100623_161300.json' $
+;      config_file = 'g:\BIGData\UData\Jets\Devl_20211110\Configs\config20100627_022400.json' $
+;      config_file = 'g:\BIGData\UData\Jets\Devl_20211110\Configs\config20100720_205400.json' $
+;      config_file = 'g:\BIGData\UData\Jets\Devl_20211110\Configs\config20100721_064800.json' $
+;      config_file = 'g:\BIGData\UData\Jets\Devl_20211110\Configs\config20100721_064800.json' $
+;      config_file = 'g:\BIGData\UData\Jets\Devl_20211110\Configs\config20100703_191500.json' $
+       
+    , work_dir = 'g:\BIGData\UData\Jets\Devl_20211110\Jets' $
+    , presets_file = 's:\Projects\IDL\Work\presets_test.json' $     
 ;    , cache_dir = '/home/stupishin/coronal_jets/Cache' $ ; does not need for remote_cutout
-;    , /no_load $
+    , /no_load $
 ;    , /no_cut $
 ;    , /remote_cutout $
 ;    , /ref_images $
-;    , waves = [171, 193, 211, 304] $
+    , waves = [171] $
+;    , waves = [94, 131] $
+;    , waves = [94] $
     , maxtime = 24 $
 ;    , /use_jpg $
 ;    , harc = 300 $
@@ -18,7 +32,8 @@ v = pipeline_aia_all( $
 ;    , graphtype = 1
 ;    , fps = 5 $
 ;    , method = 1 $
-;    , /test $
+    , /test $
+    , /no_details $
         )
 
 end

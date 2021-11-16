@@ -3,13 +3,17 @@ function pipeline_aia_irc_get_aspects_clusters, clust3d, clustN, aspect_threshol
 OK = 0 
 
 mask_3d = clust3d eq clustN
-ind = where(mask_3d)
-mask = total(mask_3d,3) gt 0
-pipeline_aia_irc_get_cluster_coords, mask, 1, x, y
+mask = total(mask_3d, 3) gt 0
+idxs = where(mask eq 1)
+xy = array_indices(mask, idxs)
+x = transpose(xy[0, *])
+y = transpose(xy[1, *])
+;pipeline_aia_irc_get_cluster_coords, mask, 1, x, y
 pipeline_aia_irc_principale_comps, x, y, vx, vy, caspect = total_aspect
 OK = total_aspect ge aspect_threshold_3d
 
 if OK then begin
+    ind = where(mask_3d)
     ids = array_indices(clust3d, ind)
     mi = min(ids[2, *])
     ma = max(ids[2, *])

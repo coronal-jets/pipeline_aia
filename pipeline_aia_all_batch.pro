@@ -3,7 +3,7 @@ pro l_pipeline_aia_all_batch_report, U, config_file, t0, i, ntot
           , ' performed in ', asu_sec2hms(systime(/seconds)-t0, /issecs)
 end
 
-function pipeline_aia_all_batch, config_path = config_path, _extra = _extra
+function pipeline_aia_all_batch, config_path = config_path, test = test, _extra = _extra
 
 configs = file_search(filepath('config*.json', root_dir = config_path))
 
@@ -15,6 +15,13 @@ filename = config_path + path_sep() + 'report_' + now + '.txt'
 openw, U, filename, /GET_LUN
                           
 tt = systime(/seconds)
+
+
+if n_elements(test) ne 0 then begin
+    test = asu_now_to_filename()
+endif else begin
+    test = 0
+endelse
 
 ncrash = 0L
 ntot = n_elements(configs)
@@ -30,7 +37,7 @@ foreach config_file, configs, i do begin
     endif
     
     t0 = systime(/seconds)
-    cands = pipeline_aia_all(config_file = config_file, _extra = _extra)
+    cands = pipeline_aia_all(config_file = config_file, test = test, _extra = _extra)
     l_pipeline_aia_all_batch_report, U, config_file, t0, i, ntot
     printf, U, '  -> Successfully, found ', pipeline_aia_cand_report(cands)
     flush, U

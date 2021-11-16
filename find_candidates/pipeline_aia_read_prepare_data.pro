@@ -17,24 +17,33 @@ ind0 = l_pipeline_aia_find_candidates_index(ind_seq[0])
 index = replicate(ind0, n_files)
 ;normalizing exposure
 data_full = float(data_full > 1); change to double if necessary
+
+meds = dblarr(n_files)
+exps = dblarr(n_files)
 for i = 0, n_files-1 do begin
     index[i] = l_pipeline_aia_find_candidates_index(ind_seq[i])
-    exptime = ind_seq[i].exptime
-    data_full[*,*,i] = data_full[*,*,i]/exptime
+    exps[i] = ind_seq[i].exptime
+    meds[i] = median(data_full[*, *, i])
 endfor
+medexp = median(exps)
+mmeds = median(meds)
+;for i = 0, n_files-1 do begin
+;    if medexp*0.95 ge exps[i] && exps[i] le medexp*1.05 then begin
+;        data_full[*,*,i] = data_full[*,*,i]/exps[i]*medexp
+;    endif else begin
+;        data_full[*,*,i] = data_full[*,*,i]/meds[i]*mmeds
+;    endelse
+;endfor
+
 ;running difference
 ;data_full = (data_full[*,*,1:*] + data_full[*,*,0:-2])*0.5
-
-;run_diff = data_full[*,*,1:*] - data_full[*,*,0:-2]
-;data_full = data_full[*,*,0:-1]
-;index = index[0:-1]
+;run_diff = data_full[*,*,1:-2] - data_full[*,*,0:-3]
+;run_diff2 = data_full[*,*,2:*] - data_full[*,*,0:-3]
+;data_full = data_full[*,*,0:-3]
+;index = index[0:-3]
 
 run_diff = data_full[*,*,1:*] - data_full[*,*,0:-2]
 data_full = data_full[*,*,0:-2]
 index = index[0:-2]
-
-;preprocess run_dif
-message,'Preprocessing data...',/info
-pipeline_aia_irc_preprocess_rd, run_diff
 
 end

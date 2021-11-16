@@ -1,7 +1,7 @@
 ; Main entry to Jet Analyzer
 
 function pipeline_aia_all, config_file = config_file, work_dir = work_dir, cache_dir = cache_dir, presets_file = presets_file $
-                    , fps = fps, no_load = no_load, no_cut = no_cut, no_save_empty = no_save_empty, no_visual = no_visual $
+                    , fps = fps, no_load = no_load, no_cut = no_cut, no_save_empty = no_save_empty, no_visual = no_visual, no_details = no_details $
                     , remote_cutout = remote_cutout, ref_images = ref_images $
                     , method = method, graphtype = graphtype, maxtime = maxtime, waves = waves $
                     , warc = warc, harc = harc, use_jpg = use_jpg, use_contour = use_contour $
@@ -12,13 +12,13 @@ tt = systime(/seconds)
 if n_elements(remote_cutout) eq 0 then remote_cutout = 1 ; use remote cutout by default
 if n_elements(method) eq 0 then method = 2
 if n_elements(use_jpg) eq 0 then use_jpg = 0
-if n_elements(ref_images) eq 0 then ref_images = 1
+if n_elements(ref_images) eq 0 then ref_images = 0
 
 pipeline_aia_read_presets, presets, presets_file = presets_file 
 pipeline_aia_read_down_config, config, method, config_file = config_file, waves = waves, warc = warc, harc = harc 
 if not keyword_set(work_dir) then cd, current = work_dir
 pipeline_aia_dir_tree, work_dir, config, aia_dir_cache, event_rel, aia_dir_wave_sel, obj_dir, vis_data_dir, vis_data_dir_wave $
-                     , cache_dir = cache_dir, method = method, test = test
+                     , cache_dir = cache_dir, method = method, test = test, remote_cutout = remote_cutout
 
 if ~pipeline_aia_check_dates(config, work_dir+path_sep()+event_rel, maxtime = maxtime) then begin
     print, '******** PROGRAM FINISHED ABNORMALLY, CHECK TIMES IN CONFIG! ********'
@@ -49,19 +49,20 @@ foreach wave, config.waves, i do begin
     case method of
         0: ncand = pipeline_aia_find_candidates_m0(work_dir, aia_dir_wave_sel[i], wave, obj_dir, config, files_in, presets)
         1: ncand = pipeline_aia_find_candidates(work_dir, aia_dir_wave_sel[i], wave, obj_dir, config, files_in, presets)
-        2: ncand = pipeline_aia_find_candidates_m2(work_dir, aia_dir_wave_sel[i], wave, obj_dir, config, files_in, presets)
+        2: ncand = pipeline_aia_find_candidates_m2(work_dir, aia_dir_wave_sel[i], wave, obj_dir, config, files_in, presets, run_diff, data, ind_seq)
     endcase
     cand_report.Add, {wave:wave, ncand:ncand}
     if ~keyword_set(no_visual) then begin   
         t0 = systime(/seconds)
         pipeline_aia_movie_prep_pict, work_dir, obj_dir, wave, aia_dir_wave_sel[i], vis_data_dir_wave[i], details, config, files_in.ToArray() $
-                                    , use_jpg = use_jpg, use_contour = use_contour, no_save_empty = no_save_empty, graphtype = graphtype
+                                    , use_jpg = use_jpg, use_contour = use_contour, no_save_empty = no_save_empty, graphtype = graphtype, no_details = no_details $
+                                    , run_diff = run_diff, data_full = data, ind_seq = ind_seq
         message, '******** PICTURES prepared in ' + asu_sec2hms(systime(/seconds)-t0, /issecs), /info
         pipeline_aia_make_movie, wave, vis_data_dir_wave[i], vis_data_dir, details, work_dir, config, use_jpg = use_jpg, fps = fps
     endif
 endforeach
 
-print, '******** PROGRAM FINISHED SUCCESSFULLY, found: ', pipeline_aia_cand_report(cand_report), ' in ', asu_sec2hms(systime(/seconds)-t0, /issecs), ' ********'
+print, '******** PROGRAM FINISHED SUCCESSFULLY, found: ', pipeline_aia_cand_report(cand_report), ' in ', asu_sec2hms(systime(/seconds)-tt, /issecs), ' ********'
 
 return, cand_report
 

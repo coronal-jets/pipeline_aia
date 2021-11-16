@@ -1,5 +1,5 @@
 pro pipeline_aia_dir_tree, work_dir, config, aia_dir_cache, event_rel, aia_wave_sel_rel, objects_rel, vis_data_rel, vis_data_wave_rel $
-                         , cache_dir = cache_dir, method = method, test = test
+                         , cache_dir = cache_dir, method = method, test = test, remote_cutout = remote_cutout
 
 time = anytim(config.tstart, out_style = 'UTC_EXT')
 time_rel = string(time.year,FORMAT = '(I04)') + string(time.month,FORMAT='(I02)') + string(time.day,FORMAT='(I02)') + '_' $
@@ -12,20 +12,23 @@ event_rel = time_rel $
     + '_' + strcompress(fix(config.xc),/remove_all) + '_' + strcompress(fix(config.yc),/remove_all) $ 
     + '_' + strcompress(fix(config.wpix),/remove_all) + '_' + strcompress(fix(config.hpix),/remove_all) 
 
-if keyword_set(cache_dir) then begin
-    aia_dir_cache = cache_dir
-endif else begin
-    global_rel = 'global_cache'
-    aia_dir_cache = work_dir + path_sep() + global_rel
-end
-file_mkdir, aia_dir_cache
+if not remote_cutout then begin
+    if keyword_set(cache_dir) then begin
+        aia_dir_cache = cache_dir
+    endif else begin
+            global_rel = 'global_cache'
+            aia_dir_cache = work_dir + path_sep() + global_rel
+    endelse
+    file_mkdir, aia_dir_cache
+endif
 
 event_dir = work_dir + path_sep() + event_rel
 file_mkdir, event_dir
 
 smeth = '_m' + strcompress(string(method), /remove_all)
 
-prefix = n_elements(test) gt 0 ? (isa(test, 'STRING') ? test : asu_now_to_filename()) + path_sep() : ''
+if n_elements(test) eq 0 then test = 0
+prefix = test ne 0 ? (isa(test, 'STRING') ? test : asu_now_to_filename()) + path_sep() : ''
 
 aia_dir_rel = event_rel + path_sep() + 'aia_data'
 file_mkdir, work_dir + path_sep() + aia_dir_rel

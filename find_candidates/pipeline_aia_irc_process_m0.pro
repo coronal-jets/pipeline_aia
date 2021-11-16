@@ -14,7 +14,11 @@ pipeline_aia_irc_cardinality_filter_m0, clust, par.card2
 crit = !NULL
 jmin = !NULL
 for k = 1, max(clust) do begin
-    pipeline_aia_irc_get_cluster_coords, clust, k, x, y
+;    pipeline_aia_irc_get_cluster_coords, clust, k, x, y
+    idxs = where(clust eq k)
+    xy = array_indices(clust, idxs)
+    x = transpose(xy[0, *])
+    y = transpose(xy[1, *])
     if n_elements(x) gt 0 then begin
         jcx = mean(x)
         jcy = mean(y)

@@ -77,7 +77,11 @@ for k =1, n_candidates do begin
   for t = 0, n_frames-1 do begin
     clust = clust3d[*,*,t]
     if total(clust eq k) gt 0 then begin
-      pipeline_aia_irc_get_cluster_coords, clust, k, x, y
+;      pipeline_aia_irc_get_cluster_coords, clust, k, x, y
+      idxs = where(clust eq k)
+      xy = array_indices(clust, idxs)
+      x = transpose(xy[0, *])
+      y = transpose(xy[1, *])
       pipeline_aia_irc_principale_comps, x, y, vx, vy, vbeta = vbeta, rotx = rotx, roty = roty, caspect = caspect, baspect = baspect
       j = {pos:t, x:x, y:y, aspect:caspect, baspect:baspect, vbeta:vbeta, rotx:rotx, roty:roty, clust:k, totasp:total_aspects[k]}
       candidate.add,j

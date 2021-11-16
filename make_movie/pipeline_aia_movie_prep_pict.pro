@@ -9,7 +9,8 @@ yshift = (y - ind.CRPIX2)*ind.CDELT2 + ind.CRVAL2
 end
 
 pro pipeline_aia_movie_prep_pict, work_dir, obj_dir, wave, aia_dir_wave_sel, vis_data_dir_wave, details, config, files_in $
-                                , use_jpg = use_jpg, use_contour = use_contour, no_save_empty = no_save_empty, graphtype = graphtype
+                                , use_jpg = use_jpg, use_contour = use_contour, no_save_empty = no_save_empty, graphtype = graphtype, no_details = no_details $
+                                , run_diff = run_diff, data_full = data_full, ind_seq = ind_seq
 
 if n_elements(graphtype) eq 0 then graphtype = 1
 if n_elements(use_contour) eq 0 then use_contour = 1
@@ -39,7 +40,9 @@ endelse
 
 l_pipeline_aia_movie_get_scale, 0, 0, ind_seq[0], xstep, xshift, ystep, yshift
 
-pipeline_aia_read_prepare_data, files_in, run_diff, data_full, ind_seq
+if n_elements(run_diff) eq 0 or n_elements(data_full) eq 0 or n_elements(ind_seq) eq 0 then begin
+    pipeline_aia_read_prepare_data, files_in, run_diff, data_full, ind_seq
+endif
 
 ;setting limits
 aia_lim = minmax(data_full)
@@ -75,15 +78,17 @@ foreach file_in, files_in[0:szrd[3]-1], i do begin
     sz = size(rd)
     jet = lonarr(sz[1], sz[2])
     rtitle = ''
-    for k = 0, n_elements(found_candidates)-1 do begin
+    for k = 0, found_candidates.Count()-1 do begin
         cand = found_candidates[k]
-        for j = 0, n_elements(cand)-1 do begin
-            snap = cand[j]
+        frames = cand.frames
+        for j = 0, frames.Count()-1 do begin
+            snap = frames[j]
             if snap.pos eq pos then begin
                 card = n_elements(snap.x)
                 rtitle += ' ' + strcompress(k+1,/remove_all) + '(' + strcompress(card,/remove_all) + ')' ; + aspect?
                 for n = 0, card-1 do begin
-                    jet(snap.x[n], snap.y[n]) = snap.clust
+;                    jet(snap.x[n], snap.y[n]) = snap.clust
+                    jet(snap.x[n], snap.y[n]) = 1
                 endfor
             endif    
         endfor
@@ -113,6 +118,10 @@ endforeach
 
 if graphtype eq 0 then win.Close
 
+details = list()
+
+if n_elements(no_details) gt 0 and keyword_set(no_details) then return
+
 frames_prev = 6
 frames_post = 3
 expandk = 1.4
@@ -121,11 +130,12 @@ minview = 70
 details = list()
 for k = 0, n_elements(found_candidates)-1 do begin
     cand = found_candidates[k]
-    nc = n_elements(cand)
+    frames = cand.frames
+    nc = frames.Count()
     xbox = !NULL
     ybox = !NULL
     for j = 0, nc-1 do begin
-        snap = cand[j]
+        snap = frames[j]
         if xbox eq !NULL then begin
             xbox = intarr(2)
             ybox = intarr(2)
@@ -149,8 +159,8 @@ for k = 0, n_elements(found_candidates)-1 do begin
     ybox[1] = min([ind_seq[0].naxis2-1, ybox[1]+yexpand])  
     
     l_pipeline_aia_movie_get_scale, xbox[0], ybox[0], ind_seq[0], xstep, xshift, ystep, yshift
-    from = max([0, cand[0].pos-frames_prev])
-    to = min([cand[nc-1].pos+frames_post, n_elements(files_in)-2])
+    from = max([0, frames[0].pos-frames_prev])
+    to = min([frames[nc-1].pos+frames_post, n_elements(files_in)-3])
     data_prev = !NULL
 
     if graphtype eq 0 then win = window(dimensions = windim)
@@ -174,8 +184,8 @@ for k = 0, n_elements(found_candidates)-1 do begin
         rtitle = ''
         snap = !NULL
         for jc = 0, nc-1 do begin
-            if pos eq cand[jc].pos then begin
-                snap = cand[jc]
+            if pos eq frames[jc].pos then begin
+                snap = frames[jc]
                 break
             endif  
         endfor  
@@ -211,5 +221,4 @@ for k = 0, n_elements(found_candidates)-1 do begin
     
 endfor
 
-; set_plot,'X'
 end
