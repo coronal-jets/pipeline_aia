@@ -1,8 +1,8 @@
 pro jettests_batch_win
 
 vntot = pipeline_aia_all_batch( $
-      config_path = 'g:\BIGData\UData\Jets\Devl_20211110\Configs' $
-    , work_dir = 'g:\BIGData\UData\Jets\Devl_20211110\Jets' $
+      config_path = 'g:\BIGData\UData\Jets\Devl_20211121\Configs' $
+    , work_dir = 'g:\BIGData\UData\Jets\Devl_20211121\Jets' $
     , presets_file = 's:\Projects\IDL\Work\presets_test.json' $     
 ;    , cache_dir = '/home/stupishin/coronal_jets/Cache' $ ; does not need for remote_cutout
     , /no_load $
@@ -19,7 +19,7 @@ vntot = pipeline_aia_all_batch( $
 ;    , fps = 5 $
 ;    , method = 1 $
     , /test $
-    , /no_details $
+;       , /no_details $
     )
     
 end

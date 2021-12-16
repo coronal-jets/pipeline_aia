@@ -29,7 +29,8 @@ aia_lim = !NULL
 rdf_lim = !NULL
 if file_cand eq '' then begin
     message, /info, "wave " + strcompress(wave,/remove_all) + " - no candidate file!"
-    return 
+    found_candidates = list()
+    if keyword_set(no_save_empty) then return
 endif else begin
     restore, file_cand
     if found_candidates.IsEmpty() then begin
@@ -40,7 +41,7 @@ endelse
 
 l_pipeline_aia_movie_get_scale, 0, 0, ind_seq[0], xstep, xshift, ystep, yshift
 
-if n_elements(run_diff) eq 0 or n_elements(data_full) eq 0 or n_elements(ind_seq) eq 0 then begin
+if n_elements(run_diff) eq 0 || n_elements(data_full) eq 0 || n_elements(ind_seq) eq 0 then begin
     pipeline_aia_read_prepare_data, files_in, run_diff, data_full, ind_seq
 endif
 

@@ -2,7 +2,9 @@ pro pipeline_aia_read_presets, presets, presets_file = presets_file
 
 pipeline_aia_read_presets_m0, presets0, presets_file = presets_file 
 
-presets = {MASK_THRESHOLD:2.5 $
+presets = { $
+           MEDIAN_LIM:0.1 $
+         , MASK_THRESHOLD:2.5 $
          , STD_MEDIAN:11 $
          , MIN_SIZE:2, FILL_SIZE:30, BORDER:2 $ % space morphology
          , MIN_SIZE_T:2, FILL_SIZE_T:25, BORDER_T:2 $ % space morphology
@@ -18,6 +20,8 @@ presets = {MASK_THRESHOLD:2.5 $
 
 if keyword_set(presets_file) then begin
     presets_data = asu_read_json_config(presets_file)
+    
+    presets.MEDIAN_LIM = asu_get_safe_json_key(presets_data, "MEDIAN_LIM", presets.MEDIAN_LIM)
     
     presets.MASK_THRESHOLD = asu_get_safe_json_key(presets_data, "MASK_THRESHOLD", presets.MASK_THRESHOLD)
     presets.STD_MEDIAN = asu_get_safe_json_key(presets_data, "STD_MEDIAN", presets.STD_MEDIAN)
