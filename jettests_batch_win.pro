@@ -1,9 +1,9 @@
 pro jettests_batch_win
 
 vntot = pipeline_aia_all_batch( $
-      config_path = 'g:\BIGData\UData\Jets\Devl_20211121\Configs' $
-    , work_dir = 'g:\BIGData\UData\Jets\Devl_20211121\Jets' $
-    , presets_file = 's:\Projects\IDL\Work\presets_test.json' $     
+      config_path = 'g:\BIGData\UData\Jets\Devl_20211231\Configs' $
+    , work_dir = 'g:\BIGData\UData\Jets\Devl_20211231\Jets' $
+    , presets_file = 's:\Projects\IDL\Work\presets_test_med.json' $     
 ;    , cache_dir = '/home/stupishin/coronal_jets/Cache' $ ; does not need for remote_cutout
     , /no_load $
 ;    , /no_cut $

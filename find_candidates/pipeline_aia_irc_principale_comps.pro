@@ -43,14 +43,14 @@ cb = cos(vbeta)
 vx = sqrt(cb^2*x2 + 2*cb*sb*xy + sb^2*y2)/n
 vy = sqrt(sb^2*x2 - 2*sb*cb*xy + cb^2*y2)/n
 
-mrot = [  [ cb, -sb] $
-        , [ sb,  cb] ]
+mrot = [  [  cb, sb] $
+        , [ -sb, cb] ]
 crd = dblarr(n, 2)
 crd[*, 0] = x
 crd[*, 1] = y
 result = mrot ## crd
-roty = result[*, 0]
-rotx = result[*, 1]
+rotx = result[*, 0]
+roty = result[*, 1]
 ymm = minmax(roty)
 xmm = minmax(rotx)
 

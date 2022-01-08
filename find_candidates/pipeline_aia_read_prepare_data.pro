@@ -7,7 +7,7 @@ return, {date_obs:index.date_obs, t_obs:index.t_obs, WAVELNTH:index.WAVELNTH $
 
 end
 
-pro pipeline_aia_read_prepare_data, files_in_arr, run_diff, data_full, index, median_lim = median_lim
+pro pipeline_aia_read_prepare_data, files_in_arr, run_diff, data_full, index, presets
 
 ;reading AIA files
 message,'Reading data...',/info
@@ -18,11 +18,16 @@ index = replicate(ind0, n_files)
 ;normalizing exposure
 data_full = double(data_full > 1); change to double if necessary
 
+kernel = [ [1, 2, 3, 2, 1], [2, 4, 6, 4, 2], [4, 8, 12, 8, 4], [2, 4, 6, 4, 2], [1, 2, 3, 2, 1] ] * 1d
+kernel /= total(kernel)
+
 meds = dblarr(n_files)
 ;exps = dblarr(n_files)
 for i = 0, n_files-1 do begin
     index[i] = l_pipeline_aia_find_candidates_index(ind_seq[i])
 ;    exps[i] = ind_seq[i].exptime
+    data_full[*, *, i] = median(data_full[*, *, i], presets.aia_median)
+;    data_full[*, *, i] = CONVOL(data_full[*, *, i], kernel)
     meds[i] = median(data_full[*, *, i])
 endfor
 ;medexp = median(exps)
@@ -33,7 +38,7 @@ mmeds = median(meds)
 ;data_med = dblarr(sz[1], sz[2], sz[3])
 sz = size(data_full)
 tot = sz[1]*sz[2]
-dmax = 1d + median_lim
+dmax = 1d + presets.median_lim
 dmin = 1d/dmax
 for i = 0, n_files-1 do begin
 ;    data_exp[*,*,i] = data_full[*,*,i]/exps[i]*medexp

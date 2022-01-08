@@ -5,8 +5,8 @@ if n_elements(presets) eq 0 then mincard = 0 else mincard = presets.MIN_AREA
 openw, fnum, filename, /GET_LUN
 
 printf, fnum, 'T start', 'T max', 'T end', '#', 'Duration', 'Total. card.', 'Max. card.', 'Jet asp. ratio', 'LtoW asp. ratio', 'Max. asp. ratio', 'Max. LtoW asp. ratio' $
-            , 'Speed est.', 'Max speed est.', 'Av speed est.', 'Med speed est.', 'Total length', 'Av. width', '25%', '50%', '75%', 'X from', 'X to', 'Y from', 'Y to', $
-     FORMAT = '(%"%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s")'
+            , 'Speed est.', 'Max speed est.', 'Av speed est.', 'Med speed est.', 'Base speed est.', 'Total length', 'Av. width', '25%', '50%', '75%', 'X from', 'X to', 'Y from', 'Y to', $
+     FORMAT = '(%"%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s")'
 
 for i = 0, candlist.Count()-1 do begin
     jet = candlist[i]
@@ -46,9 +46,9 @@ for i = 0, candlist.Count()-1 do begin
     dmin = wsec/60
     dsec = wsec - dmin*60
     dur = string(dmin, "'", dsec, '"', FORMAT = '(I, A, I02, A)') 
-    printf, fnum, tstart, tmax, tend, i+1, dur, jet.total_card, jet.max_card, jet.total_asp, jet.total_wasp, jet.max_asp, jet.max_wasp, jet.total_speed, jet.max_speed, jet.av_speed, jet.med_speed $
+    printf, fnum, tstart, tmax, tend, i+1, dur, jet.total_card, jet.max_card, jet.total_asp, jet.total_wasp, jet.max_asp, jet.max_wasp, jet.total_speed, jet.max_speed, jet.av_speed, jet.med_speed, jet.from_start_speed $
                     , jet.total_lng, jet.av_width, jet.quartiles[0], jet.quartiles[1], jet.quartiles[2], xbox[0], xbox[1], ybox[0], ybox[1] $
-          , FORMAT = '(%"%s, %s, %s, %d,   %s,  %d,             %d,           %5.2f,         %5.2f,          %5.2f,       %5.2f,        %6.0f,           %6.0f,         %6.0f,        %6.0f,         ' $
+          , FORMAT = '(%"%s, %s, %s, %d,   %s,  %d,             %d,           %5.2f,         %5.2f,          %5.2f,       %5.2f,        %6.0f,           %6.0f,         %6.0f,        %6.0f,         %6.0f,         ' $
                    + '%6.1f,         %6.1f,        %6.1f,            %6.1f,            %6.1f,            %7.1f, %7.1f, %7.1f, %7.1f")'
 endfor    
 

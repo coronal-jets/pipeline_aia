@@ -35,13 +35,24 @@ v = pipeline_aia_all( $
 ;-------------------------------------------------------------------------------------
 ;      config_file = 'g:\BIGData\UData\Jets\Tests_spec\Configs\config20140421_235500.json' $
 ;      config_file = 'g:\BIGData\UData\Jets\Tests_spec\Configs\config20140421_235500_t.json' $
-      config_file = 'g:\BIGData\UData\Jets\Tests_spec\Configs\config20140421_235500_t2.json' $
+;      config_file = 'g:\BIGData\UData\Jets\Tests_spec\Configs\config20140421_235500_t2.json' $
 ;      config_file = 'g:\BIGData\UData\Jets\Tests_spec\Configs\config20150308_150500.json' $
-    , work_dir = 'g:\BIGData\UData\Jets\Tests_spec\Jets' $
+;    , work_dir = 'g:\BIGData\UData\Jets\Tests_spec\Jets' $
+         
+;      config_file = 'g:\BIGData\UData\Jets\Devl_20211110\Configs\config20150206_110500.json' $
+;    , work_dir = 'g:\BIGData\UData\Jets\Devl_20211110\Jets' $
+
+;      config_file = 'g:\BIGData\UData\Jets\Devl_20211121\Configs\config20140326_210500.json' $
+;    , work_dir = 'g:\BIGData\UData\Jets\Devl_20211121\Jets' $
+;      config_file = 'g:\BIGData\UData\Jets\Devl_20211121\Configs\config20140303_181500.json' $
+;    , work_dir = 'g:\BIGData\UData\Jets\Devl_20211121\Jets' $
+;      config_file = 'g:\BIGData\UData\Jets\Devl_20211121\Configs\config20141004_100500.json' $
+      work_dir = 'g:\BIGData\UData\Jets\Devl_20211231\Jets' $
+    ,  config_file = 'g:\BIGData\UData\Jets\ConfigsBase\config20100721_064800.json' $
          
 ;-------------------------------------------------------------------------------------
          
-    , presets_file = 's:\Projects\IDL\Work\presets_test.json' $
+    , presets_file = 's:\Projects\IDL\Work\presets_test_med.json' $
              
 ;    , cache_dir = '/home/stupishin/coronal_jets/Cache' $ ; does not need for remote_cutout
     , /no_load $

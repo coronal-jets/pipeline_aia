@@ -6,7 +6,7 @@ end
 function pipeline_aia_irc_filter_clusters_get_features, clust, k, presets, rd_check
 
 features = {clust_n:k, pos: 0L, length:0L, total_card:0L, max_card:0L, total_asp:0d, max_asp:0d, max_basp:0d, max_wasp:0d, total_wasp:0d $
-          , total_speed:0d, max_speed:0d, av_speed:0d, med_speed:0d, total_lng:0d, av_width:0d, frames:list(), quartiles:[0d, 0d, 0d]}
+          , total_speed:0d, max_speed:0d, av_speed:0d, med_speed:0d, from_start_speed:0d, total_lng:0d, av_width:0d, frames:list(), quartiles:[0d, 0d, 0d]}
 
 cmask = clust eq k
 
@@ -47,6 +47,8 @@ speeds = dblarr(ma-mi+1)
 nspeeds = 0
 sigma = dblarr(totcard);
 sigpos = 0
+xsc0 = !NULL
+ys0 = !NULL
 for f = mi, ma do begin
     frame = pipeline_aia_irc_filter_clusters_get_features_frame(f, 0, 0L, 0L, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d)
     c = clust[*, *, f]
@@ -75,10 +77,18 @@ for f = mi, ma do begin
             speeds[nspeeds] = speed
             nspeeds += 1
         endif
+        features.max_speed = max([features.max_speed, speed])
+        
+        if f eq mi then begin
+            xs0 = x 
+            ys0 = y
+        endif else begin
+            features.from_start_speed = max([features.from_start_speed, pipeline_aia_irc_get_aspects_clusters_get_speed(prevx, prevy, x, y, f - mi)])
+        endelse
+        
         prevx = x
         prevy = y
         prevf = f
-        features.max_speed = max([features.max_speed, speed])
         
         frame = pipeline_aia_irc_filter_clusters_get_features_frame(f, n_elements(x), x, y, vbeta, caspect, baspect, waspect, rotx, roty, k, speed)
     endif

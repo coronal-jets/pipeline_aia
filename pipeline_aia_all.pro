@@ -61,11 +61,15 @@ foreach wave, config.waves, i do begin
     cand_report.Add, {wave:wave, ncand:ncand}
     if ~keyword_set(no_visual) then begin   
         t0 = systime(/seconds)
-        pipeline_aia_movie_prep_pict, work_dir, obj_dir, wave, aia_dir_wave_sel[i], vis_data_dir_wave[i], details, config, files_in.ToArray() $
+;        pipeline_aia_movie_prep_pict, work_dir, obj_dir, wave, aia_dir_wave_sel[i], vis_data_dir_wave[i], details, config, files_in.ToArray() $
+;                                    , use_jpg = use_jpg, use_contour = use_contour, no_save_empty = no_save_empty, graphtype = graphtype, no_details = no_details $
+;                                    , run_diff = run_diff, data_full = data, ind_seq = ind_seq
+;        message, '******** PICTURES prepared in ' + asu_sec2hms(systime(/seconds)-t0, /issecs), /info
+;        pipeline_aia_make_movie, wave, vis_data_dir_wave[i], vis_data_dir, details, work_dir, config, use_jpg = use_jpg, fps = fps
+        pipeline_aia_movie_prep_pict_movie, work_dir, obj_dir, vis_data_dir, wave, aia_dir_wave_sel[i], vis_data_dir_wave[i], details, config, presets, files_in.ToArray() $
                                     , use_jpg = use_jpg, use_contour = use_contour, no_save_empty = no_save_empty, graphtype = graphtype, no_details = no_details $
-                                    , run_diff = run_diff, data_full = data, ind_seq = ind_seq
-        message, '******** PICTURES prepared in ' + asu_sec2hms(systime(/seconds)-t0, /issecs), /info
-        pipeline_aia_make_movie, wave, vis_data_dir_wave[i], vis_data_dir, details, work_dir, config, use_jpg = use_jpg, fps = fps
+                                    , run_diff = run_diff, data_full = data, ind_seq = ind_seq, fps = fps
+        message, '******** PICTURES/VIDEO prepared in ' + asu_sec2hms(systime(/seconds)-t0, /issecs), /info
     endif
 endforeach
 

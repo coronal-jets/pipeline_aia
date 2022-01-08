@@ -3,7 +3,7 @@ function pipeline_aia_find_candidates_m2, work_dir, aia_dir_wave_sel, wave, obj_
 t0 = systime(/seconds)
 
 pipeline_aia_get_input_files, config, work_dir + path_sep() + aia_dir_wave_sel, files_in
-pipeline_aia_read_prepare_data, files_in.ToArray(), rd_proc, data, ind_seq, median_lim = presets.median_lim
+pipeline_aia_read_prepare_data, files_in.ToArray(), rd_proc, data, ind_seq, presets
 run_diff = rd_proc
 
 if keyword_set(no_cand) then return, 0
