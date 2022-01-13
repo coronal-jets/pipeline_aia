@@ -48,8 +48,8 @@ for i = 0, candlist.Count()-1 do begin
     dur = string(dmin, "'", dsec, '"', FORMAT = '(I, A, I02, A)') 
     printf, fnum, tstart, tmax, tend, i+1, dur, jet.total_card, jet.max_card, jet.total_asp, jet.total_wasp, jet.max_asp, jet.max_wasp, jet.total_speed, jet.max_speed, jet.av_speed, jet.med_speed, jet.from_start_speed $
                     , jet.total_lng, jet.av_width, jet.quartiles[0], jet.quartiles[1], jet.quartiles[2], xbox[0], xbox[1], ybox[0], ybox[1] $
-          , FORMAT = '(%"%s, %s, %s, %d,   %s,  %d,             %d,           %5.2f,         %5.2f,          %5.2f,       %5.2f,        %6.0f,           %6.0f,         %6.0f,        %6.0f,         %6.0f,         ' $
-                   + '%6.1f,         %6.1f,        %6.1f,            %6.1f,            %6.1f,            %7.1f, %7.1f, %7.1f, %7.1f")'
+          , FORMAT = '(%"%s, %s, %s, %d,   %s,  %d,             %d,           %7.2f,         %7.2f,          %7.2f,       %7.2f,        %8.0f,           %8.0f,         %8.0f,        %8.0f,         %8.0f,         ' $
+                   + '%8.1f,         %8.1f,        %8.1f,            %8.1f,            %8.1f,            %8.1f, %8.1f, %8.1f, %8.1f")'
 endfor    
 
 close, fnum

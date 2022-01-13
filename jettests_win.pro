@@ -47,12 +47,16 @@ v = pipeline_aia_all( $
 ;      config_file = 'g:\BIGData\UData\Jets\Devl_20211121\Configs\config20140303_181500.json' $
 ;    , work_dir = 'g:\BIGData\UData\Jets\Devl_20211121\Jets' $
 ;      config_file = 'g:\BIGData\UData\Jets\Devl_20211121\Configs\config20141004_100500.json' $
+
       work_dir = 'g:\BIGData\UData\Jets\Devl_20211231\Jets' $
-    ,  config_file = 'g:\BIGData\UData\Jets\ConfigsBase\config20100721_064800.json' $
+;    ,  config_file = 'g:\BIGData\UData\Jets\Devl_20211231\Configs\config20100627_022400.json' $
+    ,  config_file = 'g:\BIGData\UData\Jets\Devl_20211231\Configs\config20141004_100500.json' $
          
 ;-------------------------------------------------------------------------------------
          
-    , presets_file = 's:\Projects\IDL\Work\presets_test_med.json' $
+;    , presets_file = 's:\Projects\IDL\Work\presets_new.json' $
+;    , presets_file = 's:\Projects\IDL\Work\presets_new_3.1.json' $
+    , presets_file = 's:\Projects\IDL\Work\presets_new_3.3_v13.json' $
              
 ;    , cache_dir = '/home/stupishin/coronal_jets/Cache' $ ; does not need for remote_cutout
     , /no_load $
