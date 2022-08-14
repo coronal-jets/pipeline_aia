@@ -1,16 +1,18 @@
 pro jettests
 
 v = pipeline_aia_all( $
-      config_file = '/home/stupishin/coronal_jets/ConfWork/config20150825_022500.json' $
-    , work_dir = '/home/stupishin/coronal_jets/JetsWork' $
-;    , presets_file = '/home/stupishin/idl/lib/pipeline_aia/presets_std.json' $     
+
+      work_dir = '/home/stupishin/Jet_test' $
+    , config_file = '/home/stupishin/coronal_jets/pipeline_aia/config_sample.json' $
+    , presets_file = '/home/stupishin/coronal_jets/pipeline_aia/presets_default.json' $
+    
+;    , waves = [171] $
 ;    , cache_dir = '/home/stupishin/coronal_jets/Cache' $ ; does not need for remote_cutout
 ;    , /no_load $
 ;    , /no_cut $
 ;    , /remote_cutout $
 ;    , /ref_images $
-;    , waves = [171, 193, 211, 304] $
-    , maxtime = 24 $
+;    , maxtime = 24 $
 ;    , /use_jpg $
 ;    , harc = 300 $
 ;    , warc = 300 $
@@ -19,6 +21,8 @@ v = pipeline_aia_all( $
 ;    , fps = 5 $
 ;    , method = 1 $
 ;    , /test $
+;    , /no_cand $
+;    , /no_details $
         )
 
 end
