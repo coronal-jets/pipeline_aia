@@ -6,6 +6,14 @@ pipeline_aia_get_input_files, config, work_dir + path_sep() + aia_dir_wave_sel, 
 pipeline_aia_read_prepare_data, files_in.ToArray(), rd_proc, data, ind_seq, presets
 run_diff = rd_proc
 
+;szd = size(data)
+;nd = szd[3]
+;flux = dblarr(nd)
+;for i = 0, nd-1 do begin
+;    flux[i] = total(data[*, *, i])
+;endfor
+;save, filename = "s:\University\Work\11312_for_2022\flux171.sav", flux
+
 if keyword_set(no_cand) then return, 0
 
 ;preprocess run_dif
