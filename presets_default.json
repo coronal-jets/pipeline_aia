@@ -22,5 +22,5 @@
 	"MIN_AV_SPEED":20.9,
 	"MIN_Q25":3.49,
 	"MIN_Q75":4.23,
-	"DEBUG":0,
+	"DEBUG":1,
 }
