@@ -14,7 +14,7 @@ swave = strcompress(wave, /remove_all)
 
 ds = 'aia.lev1_euv_12s'
 if (swave eq '1600') or (swave eq '1700') then begin
-  ds = 'aia.lev1_euv_24s'
+  ds = 'aia.lev1_uv_24s'
 endif
 
 time = anytim(config.tstart, out_style = 'UTC_EXT')
