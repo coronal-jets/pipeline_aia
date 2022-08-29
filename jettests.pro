@@ -4,7 +4,10 @@ v = pipeline_aia_all( $
 
       work_dir = '/home/stupishin/Jet_test' $
     , config_file = '/home/stupishin/coronal_jets/pipeline_aia/config_sample.json' $
+    
     , presets_file = '/home/stupishin/coronal_jets/pipeline_aia/presets_default.json' $
+    , no_cand  = 0 $
+    , no_visual = 0 $
     
 ;    , waves = [171] $
 ;    , cache_dir = '/home/stupishin/coronal_jets/Cache' $ ; does not need for remote_cutout
@@ -21,7 +24,6 @@ v = pipeline_aia_all( $
 ;    , fps = 5 $
 ;    , method = 1 $
 ;    , /test $
-;    , /no_cand $
 ;    , /no_details $
         )
 

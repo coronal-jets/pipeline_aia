@@ -4,7 +4,10 @@ v = pipeline_aia_all( $
 
       work_dir = 'c:\Temp\Jet_test' $
     , config_file = 's:\Projects\IDL\Jets\pipeline_aia\config_sample.json' $
+    
     , presets_file = 's:\Projects\IDL\Jets\pipeline_aia\presets_default.json' $
+    , no_cand  = 0 $
+    , no_visual = 0 $
     
 ;    , waves = [171] $
 ;    , cache_dir = '/home/stupishin/coronal_jets/Cache' $ ; does not need for remote_cutout
@@ -21,7 +24,6 @@ v = pipeline_aia_all( $
 ;    , fps = 5 $
 ;    , method = 1 $
 ;    , /test $
-;    , /no_cand $
 ;    , /no_details $
         )
 end
